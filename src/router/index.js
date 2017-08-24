@@ -6,6 +6,7 @@ import Test from '../pages/test.vue'
 import Report from '../pages/repair/report.vue'
 import Community from '../pages/community/community.vue'
 import Meeting from '../pages/meeting/meeting.vue'
+import Bill from '../pages/bill/bill.vue'
 
 // 登录
 const Login = resolve => {
@@ -59,6 +60,19 @@ const MeetingList = resolve => {
 }
 const MeetingAdd = resolve => require.ensure(['../pages/meeting/add.vue'], () => resolve(require('../pages/meeting/add.vue')), 'meeting-group')
 const MeetingRoom = resolve => require.ensure(['../pages/meeting/roomDetail.vue'], () => resolve(require('../pages/meeting/roomDetail.vue')), 'meeting-group')
+const MeetingMyOrder = resolve => require.ensure(['../pages/meeting/myOrder.vue'], () => resolve(require('../pages/meeting/myOrder.vue')), 'meeting-group')
+const MeetingMyOrderDetail = resolve => require.ensure(['../pages/meeting/myOrderDetail.vue'], () => resolve(require('../pages/meeting/myOrderDetail.vue')), 'meeting-group')
+
+// 企业账单
+const BillList = resolve => {
+    Loading.open('加载中...')
+    require.ensure(['../pages/bill/list.vue'], () => {
+        resolve(require('../pages/bill/list.vue'))
+        Loading.close()
+    }, 'bill-group')
+}
+const BillListDetail = resolve => require.ensure(['../pages/bill/detail.vue'], () => resolve(require('../pages/bill/detail.vue')), 'bill-group')
+const BillListDetailConfirm = resolve => require.ensure(['../pages/bill/confirm.vue'], () => resolve(require('../pages/bill/confirm.vue')), 'bill-group')
 
 Vue.use(Router)
 export default new Router({
@@ -212,6 +226,55 @@ export default new Router({
                     component: MeetingAdd,
                     meta: {
                         title: '添加会议室预定',
+                        backIcon: true
+                    },
+                },
+                {
+                    path: 'myorder',
+                    component: MeetingMyOrder,
+                    meta: {
+                        title: '我的预定',
+                        backIcon: true
+                    },
+                },
+                {
+                    path: 'myorder/detail/:orderId',
+                    component: MeetingMyOrderDetail,
+                    meta: {
+                        title: '会议室预定详情',
+                        backIcon: true
+                    },
+                }
+            ]
+        },
+        {
+            path: '/bill',
+            component: Bill,
+            meta: {
+                title: '企业账单'
+            },
+            children: [
+                {
+                    path: 'list',
+                    component: BillList,
+                    meta: {
+                        title: '企业账单',
+                        backIcon: false
+                    },
+                },
+                {
+                    path: 'detail/:billId',
+                    component: BillListDetail,
+                    meta: {
+                        title: '账单详情',
+                        backIcon: true
+                    },
+                },
+                {
+                    path: 'detail/:billId/confirm',
+                    component: BillListDetailConfirm,
+                    meta: {
+                        title: '账单支付确认',
                         backIcon: true
                     },
                 }

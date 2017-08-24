@@ -12,15 +12,19 @@
             <router-link to="/community/list">社群活动</router-link>
             <br>
             <router-link to="/meeting/list">会议室预定</router-link>
+            <br>
+            <router-link to="/bill/list">企业账单</router-link>
         </div>
     </div>
 </template>
 <script>
+
     export default {
         data() {
             return {}
         },
-        components: {},
+        components: {
+        },
         methods: {}
     }
 </script>
