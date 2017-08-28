@@ -7,7 +7,9 @@ import 'vue-ydui/dist/ydui.base.css';
 import './common/stylus/index.styl'
 import App from './App.vue'
 import router from './router'
+import moment from 'moment'
 
+Vue.prototype.moment = moment
 Vue.use(VueResource)
 
 import {Button, ButtonGroup} from 'vue-ydui/dist/lib.rem/button';

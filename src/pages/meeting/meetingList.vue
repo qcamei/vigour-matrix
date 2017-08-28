@@ -1,20 +1,47 @@
 <template>
     <div>
-        <yd-tab>
-            <yd-tab-panel v-for="(day, idx) in infos" :key="idx" :label="day.date">
-                <div class="meeting-item" v-for="(roomItem, index) in day.room" @click="roomDetail(roomItem.roomId)">
-                    <div class="title">{{ roomItem.roomName }}</div>
-                    <div class="desc">{{ roomItem.describe }}</div>
+        <yd-tab v-if="totalInfo && totalInfo.length === 5">
+            <yd-tab-panel v-for="(day, idx) in totalInfo" :key="idx" :label="day.date">
+                <div class="meeting-item" v-for="(roomItem, index) in day.room" @click="roomDetail(roomItem)">
+                    <div class="title">{{ roomItem.tierName }}</div>
+                    <div class="desc">{{ roomItem.description }}</div>
                     <div class="meetbar-con">
-                        <div class="meetbar-item" v-for="(colorItem, colorIdx) in roomItem.roomStatus">
-                            <div v-if="colorItem === 'busy'" class="color" style="background-color: #89D6D4"></div>
-                            <div v-else-if="colorItem === 'mine'" class="color" style="background-color: #F8E71C"></div>
-                            <div v-else="colorItem === ''" class="color" ></div>
-                            <div class="time">{{ ('0' + (colorIdx.slice(5))).slice(-2) }}</div>
+                        <div class="even-bar">
+                            <span style="left: 8.33%">10:00</span>
+                            <span style="left: 25%">12:00</span>
+                            <span style="left: 41.66%">14:00</span>
+                            <span style="left: 58.33%">16:00</span>
+                            <span style="left: 75%">18:00</span>
+                            <span style="left: 91.66%">20:00</span>
+                        </div>
+
+                        <div class="timeline">
+                            <div
+                                v-if="roomItem.reserveVos.length"
+                                v-for="colorItem in roomItem.reserveVos"
+                                class="color-block"
+                                :style="{
+                                    width: (colorItem.endNum - colorItem.startNum) / 720 * 100 + '%',
+                                    left: (colorItem.startNum / 720) * 100 + '%',
+                                    backgroundColor: colorItem.me ? myColor : otherColor
+                                }"
+                            ></div>
+                            <!--width: 20%; background-color: #89D6D4; left: 20%-->
+                            <span class="shortline" style="left: 0"></span>
+                            <span class="shortline" v-for="n in 12" :style="{left: n * (100/12) + '%'}"></span>
+                        </div>
+                        <div class="odd-bar">
+                            <span style="left: 0">09:00</span>
+                            <span style="left: 16.66%">11:00</span>
+                            <span style="left: 33.33%">13:00</span>
+                            <span style="left: 50%">15:00</span>
+                            <span style="left: 66.66%">17:00</span>
+                            <span style="left: 83.33%">19:00</span>
+                            <span style="left: 100%">21:00</span>
                         </div>
                     </div>
                     <yd-button
-                        @click.native.stop="orderMeet(roomItem.roomId)"
+                        @click.native.stop="orderMeet(roomItem)"
                         class="order-btn" type="hollow"
                         bgcolor="#fff"
                         color="#00A7A3"
@@ -27,198 +54,45 @@
     </div>
 </template>
 <script>
-    import {Tab, TabPanel} from 'vue-ydui/dist/lib.rem/tab';
+    import {Tab, TabPanel} from 'vue-ydui/dist/lib.rem/tab'
+    import moment from 'moment'
+    import {getMeetingList} from '../../api/meeting'
 
     export default {
+        watch: {
+            infos: {
+                handler(cur, old) {
+                    this.totalInfo = cur
+                },
+                deep: true
+            }
+        },
+        created() {
+             this.$dialog.loading.open('加载中...')
+            getMeetingList(moment().format('YYYY-MM-DD'))
+                .then(res => {
+                    res.body.data.forEach(item => {
+                        this.roomList.push(item.tierName)
+                    })
+                    return this.infos.push({
+                        date: moment().format('MM月DD日'),
+                        room: res.body.data,
+                    })
+                })
+                .then(() => this.getOffsetDate(1))
+                .then(() => this.getOffsetDate(2))
+                .then(() => this.getOffsetDate(3))
+                .then(() => this.getOffsetDate(4))
+                .then(() => this.$dialog.loading.close())
+                .catch(e => console.log(e))
+        },
         data() {
             return {
-                infos: [
-                    {
-                        date: '8月23日',
-                        room: [
-                            {
-                                roomId: 1,
-                                roomName: '会议室一',
-                                describe: '可容纳20人，并提供八爪鱼',
-                                roomStatus: {
-                                    clock9: '',
-                                    clock10: '',
-                                    clock11: 'busy',
-                                    clock12: 'busy',
-                                    clock13: 'busy',
-                                    clock14: 'busy',
-                                    clock15: '',
-                                    clock16: 'mine',
-                                    clock17: 'mine',
-                                    clock18: '',
-                                    clock19: '',
-                                    clock20: '',
-                                    clock21: ''
-                                }
-                            },
-                            {
-                                roomId: 2,
-                                roomName: '会议室二',
-                                describe: '可容纳20人，并提供八爪鱼',
-                                roomStatus: {
-                                    clock9: '',
-                                    clock10: '',
-                                    clock11: 'busy',
-                                    clock12: 'busy',
-                                    clock13: 'busy',
-                                    clock14: 'busy',
-                                    clock15: '',
-                                    clock16: '',
-                                    clock17: '',
-                                    clock18: 'mine',
-                                    clock19: '',
-                                    clock20: 'mine',
-                                    clock21: ''
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        date: '8月24日',
-                        room: [
-                            {
-                                roomId: 1,
-                                roomName: '会议室一',
-                                describe: '可容纳20人，并提供八爪鱼',
-                                roomStatus: {
-                                    clock9: '',
-                                    clock10: '',
-                                    clock11: '',
-                                    clock12: 'busy',
-                                    clock13: '',
-                                    clock14: 'busy',
-                                    clock15: '',
-                                    clock16: 'mine',
-                                    clock17: 'mine',
-                                    clock18: '',
-                                    clock19: '',
-                                    clock20: '',
-                                    clock21: ''
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        date: '8月25日',
-                        room: [
-                            {
-                                roomId: 1,
-                                roomName: '会议室一',
-                                describe: '可容纳20人，并提供八爪鱼',
-                                roomStatus: {
-                                    clock9: '',
-                                    clock10: '',
-                                    clock11: 'busy',
-                                    clock12: 'busy',
-                                    clock13: 'busy',
-                                    clock14: 'busy',
-                                    clock15: '',
-                                    clock16: 'mine',
-                                    clock17: 'mine',
-                                    clock18: '',
-                                    clock19: '',
-                                    clock20: '',
-                                    clock21: ''
-                                }
-                            },
-                            {
-                                roomId: 2,
-                                roomName: '会议室二',
-                                describe: '可容纳20人，并提供八爪鱼',
-                                roomStatus: {
-                                    clock9: '',
-                                    clock10: '',
-                                    clock11: 'busy',
-                                    clock12: 'busy',
-                                    clock13: 'busy',
-                                    clock14: 'busy',
-                                    clock15: '',
-                                    clock16: '',
-                                    clock17: '',
-                                    clock18: 'mine',
-                                    clock19: '',
-                                    clock20: 'mine',
-                                    clock21: ''
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        date: '8月26日',
-                        room: [
-                            {
-                                roomId: 1,
-                                roomName: '会议室一',
-                                describe: '可容纳20人，并提供八爪鱼',
-                                roomStatus: {
-                                    clock9: '',
-                                    clock10: '',
-                                    clock11: '',
-                                    clock12: 'busy',
-                                    clock13: '',
-                                    clock14: 'busy',
-                                    clock15: '',
-                                    clock16: 'mine',
-                                    clock17: 'mine',
-                                    clock18: '',
-                                    clock19: '',
-                                    clock20: '',
-                                    clock21: ''
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        date: '8月27日',
-                        room: [
-                            {
-                                roomId: 1,
-                                roomName: '会议室一',
-                                describe: '可容纳20人，并提供八爪鱼',
-                                roomStatus: {
-                                    clock9: '',
-                                    clock10: '',
-                                    clock11: 'busy',
-                                    clock12: 'busy',
-                                    clock13: 'busy',
-                                    clock14: 'busy',
-                                    clock15: '',
-                                    clock16: 'mine',
-                                    clock17: 'mine',
-                                    clock18: '',
-                                    clock19: '',
-                                    clock20: '',
-                                    clock21: ''
-                                }
-                            },
-                            {
-                                roomId: 2,
-                                roomName: '会议室二',
-                                describe: '可容纳20人，并提供八爪鱼',
-                                roomStatus: {
-                                    clock9: '',
-                                    clock10: '',
-                                    clock11: 'busy',
-                                    clock12: 'busy',
-                                    clock13: 'busy',
-                                    clock14: 'busy',
-                                    clock15: '',
-                                    clock16: '',
-                                    clock17: '',
-                                    clock18: 'mine',
-                                    clock19: '',
-                                    clock20: 'mine',
-                                    clock21: ''
-                                }
-                            }
-                        ]
-                    }
-                ]
+                infos: [],
+                totalInfo: null,
+                otherColor: '#89D6D4',
+                myColor: '#F8E71C',
+                roomList: []
             }
         },
         components: {
@@ -226,11 +100,23 @@
             [TabPanel.name]: TabPanel
         },
         methods: {
-            orderMeet(roomId) {
-                this.$router.push(`/meeting/add/${roomId}`)
+            orderMeet(roomItem) {
+                this.$router.push({name: 'meetingAdd', params: {
+                    id: roomItem.id,
+                    tierName: roomItem.tierName,
+                    roomList: encodeURIComponent(this.roomList)
+                }})
             },
             roomDetail(roomId) {
                 this.$router.push(`/meeting/room/${roomId}`)
+            },
+            getOffsetDate(offsetDay) {
+                return getMeetingList(moment().add(offsetDay, 'days').format('YYYY-MM-DD')).then(res => {
+                    this.infos.push({
+                        date: moment().add(offsetDay, 'days').format('MM月DD日'),
+                        room: res.body.data,
+                    })
+                })
             }
         }
     }
@@ -239,7 +125,7 @@
     .meeting-item
         position relative
         width 100%
-        padding .2rem
+        padding .2rem .4rem
         background-color #fff
         display flex
         flex-direction column
@@ -256,25 +142,52 @@
             font-size .24rem
             color: #999
             line-height .34rem
-            margin-top .08rem
+            margin-top .12rem
+            width 5rem
+            text-overflow: ellipsis
+            overflow hidden
+            white-space nowrap
         .meetbar-con
             display flex
+            flex-direction column
             justify-content space-between
-            margin-top .18rem
-            .meetbar-item
-                display flex
-                flex-direction column
-                width .4rem
-                justify-content space-between
-                .color
-                    width .4rem
-                    height .54rem
-                    background-color #e5f6f5
-                .time
-                    font-size .2rem
-                    color #999
-                    text-align center
-                    margin-top .06rem
+            margin-top .2rem
+            height 1.04rem
+            box-sizing border-box
+            color #999
+            .even-bar
+                position relative
+                height .28rem
+                span
+                    position absolute
+                    transform translateX(-50%)
+                    font-size .2rem !important
+            .timeline
+                position relative
+                margin-top .1rem
+                height .28rem
+                background-color #e5f6f5
+                box-sizing border-box
+                width 100%
+                .color-block
+                    position absolute
+                    height 100%
+                .shortline
+                    position absolute
+                    display inline-block
+                    width 1px
+                    height 110%
+                    background-color #00a7a3
+                .shortline:nth-child(odd)
+                    top -10%
+            .odd-bar
+                position relative
+                height .28rem
+                margin-top .1rem
+                span
+                    position absolute
+                    transform translateX(-50%)
+                    font-size .2rem !important
         .order-btn
             width 1.2rem
             height .52rem

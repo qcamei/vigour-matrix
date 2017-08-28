@@ -188,7 +188,6 @@
             },
             commit() {
                 this.submit()
-                return
                 for (let i = 0; i < 4; i++) {
                     var validFlag = this.$refs['input' + i].valid
                     if (!validFlag) {

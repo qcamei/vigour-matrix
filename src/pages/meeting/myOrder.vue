@@ -5,12 +5,13 @@
             <yd-list slot="list">
                 <router-link :to="`/meeting/myorder/detail/${item.id}`" v-for="(item, idx) in list" :key="idx">
                     <div class="history-con">
-                        <div class="title">{{item.title}}</div>
+                        <div class="title">{{item.resourceName}}</div>
                         <div class="info-con">
-                            <div class="date-time">{{item.datetime}}</div>
+                            <div class="date-time">{{ moment(item.reserveDate).format('MM-DD') }} {{ moment(item.startDate).format('HH:mm') }}-{{ moment(item.endDate).format('HH:mm') }}</div>
                             <div class="status">
                                 <span>预定状态：</span>
-                                <span :style="{color: item.status == 'cancel' ? '#e65966' : void 0}" v-text="item.status == 'ok' ? '已预订' : '已取消'"></span>
+                                <span :style="{color: item.status != 'NORMAL' ? '#e65966' : void 0}"
+                                      v-text="item.status == 'NORMAL' ? '已预订' : '已取消'"></span>
                             </div>
                         </div>
                     </div>
@@ -27,64 +28,43 @@
     </div>
 </template>
 <script>
+    import moment from 'moment'
+    import { orderHistoryList } from '../../api/meeting'
+
     export default {
+        created() {
+            this.loadList()
+        },
         data() {
             return {
                 page: 1,
-                pageSize: 10,
-                list: [
-                    {
-                        id: 1,
-                        title: '会议室1',
-                        datetime: '2016-09-10 16:00-18:00',
-                        status: 'ok'
-                    },
-                    {
-                        id: 2,
-                        title: '会议室4',
-                        datetime: '2016-09-10 16:00-18:00',
-                        status: 'cancel'
-                    },
-                    {
-                        id: 3,
-                        title: '会议室2',
-                        datetime: '2016-09-10 16:00-18:00',
-                        status: 'ok'
-                    },
-                    {
-                        id: 4,
-                        title: '会议室1',
-                        datetime: '2016-09-10 16:00-18:00',
-                        status: 'cancel'
-                    },
-                ]
+                limit: 10,
+                list: []
             }
         },
         components: {},
         methods: {
             loadList() {
-                console.log(this.$http.jsonp);
-                this.$http.jsonp('http://list.ydui.org/getdata.php?type=backposition', {
-                    params: {
-                        page: this.page,
-                        pagesize: this.pageSize
-                    }
-                }).then(function (response) {
-                    const _list = response.body;
+                orderHistoryList({
+                    page: this.page,
+                    limit: this.limit
+                })
+                    .then(res => {
+                        const _list = res.body.data.items
 
-                    this.list = [...this.list, ..._list];
+                        this.list = [...this.list, ..._list]
 
-                    if (_list.length < this.pageSize || this.page == 3) {
-                        /* 所有数据加载完毕 */
-                        this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.loadedDone');
-                        return;
-                    }
+                        if (_list.length < this.limit || this.page == 3) {
+                            /* 所有数据加载完毕 */
+                            this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.loadedDone')
+                            return;
+                        }
 
-                    /* 单次请求数据完毕 */
-                    this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.finishLoad');
+                        /* 单次请求数据完毕 */
+                        this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.finishLoad')
 
-                    this.page++;
-                });
+                        this.page++
+                    })
             }
         }
     }
@@ -105,6 +85,7 @@
             color #24242c
             .title
                 font-size .3rem
+                font-weight 600
             .info-con
                 display flex
                 flex-direction column

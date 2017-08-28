@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import {Loading} from 'vue-ydui/dist/lib.rem/dialog';
+import {Loading} from 'vue-ydui/dist/lib.rem/dialog'
 
 import Test from '../pages/test.vue'
 import Report from '../pages/repair/report.vue'
@@ -214,7 +214,7 @@ export default new Router({
                     },
                 },
                 {
-                    path: 'room/:roomId',
+                    path: 'room/:id',
                     component: MeetingRoom,
                     meta: {
                         title: '会议室信息',
@@ -222,8 +222,9 @@ export default new Router({
                     },
                 },
                 {
-                    path: 'add/:roomId',
+                    path: 'add/:id/:tierName/:roomList',
                     component: MeetingAdd,
+                    name: 'meetingAdd',
                     meta: {
                         title: '添加会议室预定',
                         backIcon: true
