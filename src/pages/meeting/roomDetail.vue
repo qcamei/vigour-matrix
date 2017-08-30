@@ -3,15 +3,13 @@
         <yd-cell-group id="input-group" style="margin-bottom: .24rem">
             <yd-cell-item>
                 <span slot="left" class="label-text">可容纳人数</span>
-                <span slot="right" class="value-text">{{ info.count }}人</span>
+                <span slot="right" class="value-text">{{ info.cotainNum }}人</span>
             </yd-cell-item>
             <yd-cell-item style="height: 2.4rem">
                 <span slot="left" class="label-text">照片</span>
                 <div slot="right" class="image-con">
                     <ul class="upload-list">
-                        <li><img src="https://ss1.baidu.com/6ONXsjip0QIZ8tyhnq/it/u=2401881700,2342273471&fm=58"/></li>
-                        <li><img src="https://ss1.baidu.com/6ONXsjip0QIZ8tyhnq/it/u=2401881700,2342273471&fm=58"/></li>
-                        <li><img src="https://ss1.baidu.com/6ONXsjip0QIZ8tyhnq/it/u=2401881700,2342273471&fm=58"/></li>
+                        <li v-for="(image, idx) in imageList" :key="idx"><img :src="image"/></li>
                     </ul>
                 </div>
             </yd-cell-item>
@@ -35,31 +33,49 @@
                     slot="right"
                     maxlength="140"
                     :readonly="true"
-                    v-html="info.detail">
+                    v-html="info.description">
                 </yd-textarea>
             </yd-cell-item>
         </yd-cell-group>
 
         <div class="posts-btn-con">
-            <yd-button @click.native="addOrder" class="posts-btn" size="large" type="primary" bgcolor="#00A7A3" color="#fff">添加预定</yd-button>
+            <yd-button @click.native="addOrder" class="posts-btn" size="large" type="primary" bgcolor="#00A7A3"
+                       color="#fff">添加预定
+            </yd-button>
         </div>
     </div>
 </template>
 <script>
+    import moment from 'moment'
+    import {getMeetingList} from '../../api/api'
+
     export default {
+        created() {
+            getMeetingList(moment().format('YYYY-MM-DD'))
+                .then(res => {
+                    res.body.data.forEach(item => this.roomList.push(item.tierName))
+                    return res
+                })
+                .then(res => this.info = res.body.data.find(item => item.id == this.$route.params.id))
+                .then(data => this.imageList = JSON.parse(data.images))
+        },
         data() {
             return {
-                info: {
-                    id: 1,
-                    count: 7,
-                    detail: '中央空调会在下班（18:00）后关闭中央空调会在下班（18:00）后关闭中央空调会在下班（18:00）后关闭中央空调会在下班（18:00）后关闭中央空调会在下班（18:00）后关闭中央空调会在下班（18:00）后关闭。'
-                }
+                info: {},
+                imageList: [],
+                roomList: []
             }
         },
         components: {},
         methods: {
             addOrder() {
-                this.$router.push(`/meeting/add/${this.info.id}`)
+                this.$router.push({
+                    name: 'meetingAdd', params: {
+                        id: this.info.id,
+                        tierName: this.info.tierName,
+                        roomList: encodeURIComponent(this.roomList)
+                    }
+                })
             }
         }
     }
@@ -95,6 +111,7 @@
             li
                 float left
                 margin 0 .06rem
+
     .posts-btn-con
         position fixed
         bottom 0

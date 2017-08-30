@@ -29,7 +29,7 @@
 </template>
 <script>
     import moment from 'moment'
-    import { orderHistoryList } from '../../api/meeting'
+    import { orderHistoryList } from '../../api/api'
 
     export default {
         created() {
@@ -54,7 +54,7 @@
 
                         this.list = [...this.list, ..._list]
 
-                        if (_list.length < this.limit || this.page == 3) {
+                        if (_list.length < this.limit) {
                             /* 所有数据加载完毕 */
                             this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.loadedDone')
                             return;
@@ -85,7 +85,6 @@
             color #24242c
             .title
                 font-size .3rem
-                font-weight 600
             .info-con
                 display flex
                 flex-direction column

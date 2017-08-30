@@ -3,7 +3,7 @@
         <yd-cell-group id="input-group" style="margin-bottom: .24rem">
             <yd-cell-item>
                 <span slot="left">预定人姓名</span>
-                <span slot="right" style="color: #24242c">{{info.contact}}</span>
+                <span slot="right" style="color: #24242c">{{info.name}}</span>
             </yd-cell-item>
             <yd-cell-item>
                 <span slot="left">预定人手机</span>
@@ -11,21 +11,21 @@
             </yd-cell-item>
             <yd-cell-item arrow>
                 <span slot="left">选择会议室</span>
-                <span class="a123" slot="right" style="color: #24242c">{{info.roomName}}</span>
+                <span class="a123" slot="right" style="color: #24242c">{{info.resourceName}}</span>
             </yd-cell-item>
             <yd-cell-item arrow>
                 <span slot="left">开始时间</span>
-                <span slot="right" style="color: #24242c">{{info.startTime}}</span>
+                <span slot="right" style="color: #24242c">{{moment(info.reserveDate).format('YYYY-MM-DD')}} {{moment(info.startDate).format('HH:mm')}}</span>
             </yd-cell-item>
             <yd-cell-item arrow>
                 <span slot="left">结束时间</span>
-                <span slot="right" style="color: #24242c">{{info.endTime}}</span>
+                <span slot="right" style="color: #24242c">{{moment(info.reserveDate).format('YYYY-MM-DD')}} {{moment(info.endDate).format('HH:mm')}}</span>
             </yd-cell-item>
         </yd-cell-group>
 
         <yd-cell-group title="详细描述">
             <yd-cell-item>
-                <yd-textarea slot="right" :readonly="true" maxlength="140" ref="textarea" v-html="info.content"
+                <yd-textarea slot="right" :readonly="true" maxlength="140" ref="textarea" v-html="info.memo"
                              style="text-align: left"></yd-textarea>
             </yd-cell-item>
         </yd-cell-group>
@@ -38,17 +38,20 @@
     </div>
 </template>
 <script>
+    import moment from 'moment'
+    import { orderHistoryList } from '../../api/api'
+
     export default {
+        created() {
+            orderHistoryList({
+                limit: 500
+            })
+                .then(res => res.body.data.items.find(item => item.id == this.$route.params.orderId))
+                .then(data => this.info = data)
+        },
         data() {
             return {
-                info: {
-                    contact: '张三',
-                    phone: '18027364646',
-                    roomName: '会议室1',
-                    startTime: '2017-08-07 16:00',
-                    endTime: '2017-08-07 17:00',
-                    content: '项目例会，大概一个小时！'
-                },
+                info: {},
             }
         },
         components: {},

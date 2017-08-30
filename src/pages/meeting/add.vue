@@ -72,7 +72,7 @@
     import {ActionSheet} from 'vue-ydui/dist/lib.rem/actionsheet'
     import {DateTime} from 'vue-ydui/dist/lib.rem/datetime'
     import moment from 'moment'
-    import {commitMeetingOrder} from '../../api/meeting'
+    import {commitMeetingOrder} from '../../api/api'
 
     export default {
         created() {
@@ -130,6 +130,7 @@
                         if (res.body.code == 200) {
                             return this.$dialog.toast({
                                 mes: '预定成功',
+                                timeout: 800,
                                 callback: () => {
                                     this.$router.replace('/meeting/list')
                                 }

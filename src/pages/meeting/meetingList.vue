@@ -2,7 +2,7 @@
     <div>
         <yd-tab v-if="totalInfo && totalInfo.length === 5">
             <yd-tab-panel v-for="(day, idx) in totalInfo" :key="idx" :label="day.date">
-                <div class="meeting-item" v-for="(roomItem, index) in day.room" @click="roomDetail(roomItem)">
+                <div class="meeting-item" v-for="(roomItem, index) in day.room" @click="roomDetail(roomItem.id)">
                     <div class="title">{{ roomItem.tierName }}</div>
                     <div class="desc">{{ roomItem.description }}</div>
                     <div class="meetbar-con">
@@ -56,7 +56,7 @@
 <script>
     import {Tab, TabPanel} from 'vue-ydui/dist/lib.rem/tab'
     import moment from 'moment'
-    import {getMeetingList} from '../../api/meeting'
+    import {getMeetingList} from '../../api/api'
 
     export default {
         watch: {
@@ -71,9 +71,7 @@
              this.$dialog.loading.open('加载中...')
             getMeetingList(moment().format('YYYY-MM-DD'))
                 .then(res => {
-                    res.body.data.forEach(item => {
-                        this.roomList.push(item.tierName)
-                    })
+                    res.body.data.forEach(item => this.roomList.push(item.tierName))
                     return this.infos.push({
                         date: moment().format('MM月DD日'),
                         room: res.body.data,

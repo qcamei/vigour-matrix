@@ -3,7 +3,7 @@
         <yd-cell-group id="input-group" style="margin-bottom: .24rem">
             <yd-cell-item>
                 <span slot="left">处理状态</span>
-                <input slot="right" :showClearIcon="false" v-model="postInfo.status" style="color: #e65966;" readonly>
+                <input slot="right" :showClearIcon="false" v-model="postInfo.taskStatus" style="color: #e65966;" readonly>
             </yd-cell-item>
             <yd-cell-item>
                 <span slot="left">联系人</span>
@@ -33,39 +33,39 @@
                     slot="right"
                     maxlength="140"
                     :readonly="true"
-                    v-html="postInfo.detail">
+                    v-html="postInfo.description">
                 </yd-textarea>
             </yd-cell-item>
         </yd-cell-group>
 
         <!-- 图片上传 -->
-        <div class="photo-tit">
-            <span class="text1">添加现场图片</span>
-            <span class="text2">（最多支持上传三张图片）</span>
+        <div v-if="postInfo && postInfo.taskImageUri && postInfo.taskImageUri.length">
+            <div class="photo-tit">
+                <span class="text1">添加现场图片</span>
+                <span class="text2">（最多支持上传三张图片）</span>
+            </div>
+            <ul class="upload-list">
+                <li v-for="(image, idx) in postInfo.taskImageUri" :key="idx"><img :src="image.path"/></li>
+            </ul>
         </div>
-        <ul class="upload-list">
-            <li><img src="https://ss1.baidu.com/6ONXsjip0QIZ8tyhnq/it/u=2401881700,2342273471&fm=58"/></li>
-            <li><img src="https://ss1.baidu.com/6ONXsjip0QIZ8tyhnq/it/u=2401881700,2342273471&fm=58"/></li>
-            <li><img src="https://ss1.baidu.com/6ONXsjip0QIZ8tyhnq/it/u=2401881700,2342273471&fm=58"/></li>
-        </ul>
 
         <div class="smile-con">
             <span class="tit">服务评价</span>
             <div class="icon-group">
-                <div class="item" @click="ratting = 'good'">
-                    <i v-show="ratting !== 'good'" class="max max-good"></i>
-                    <i v-show="ratting === 'good'" class="max max-good-selected"></i>
-                    <span :style="ratting == 'good' ? 'color: #00a7a3' : void 0">好评</span>
+                <div class="item" >
+                    <i v-show="ratting !== 'GOOD'" class="max max-good"></i>
+                    <i v-show="ratting === 'GOOD'" class="max max-good-selected"></i>
+                    <span :style="ratting == 'GOOD' ? 'color: #00a7a3' : void 0">好评</span>
                 </div>
-                <div class="item" @click="ratting = 'normal'">
-                    <i v-show="ratting !== 'normal'" class="max max-normal"></i>
-                    <i v-show="ratting === 'normal'" class="max max-normal-selected"></i>
-                    <span :style="ratting == 'normal' ? 'color: #00a7a3' : void 0">中评</span>
+                <div class="item" >
+                    <i v-show="ratting !== 'NORMAL'" class="max max-normal"></i>
+                    <i v-show="ratting === 'NORMAL'" class="max max-normal-selected"></i>
+                    <span :style="ratting == 'NORMAL' ? 'color: #00a7a3' : void 0">中评</span>
                 </div>
-                <div class="item" @click="ratting = 'bad'">
-                    <i v-show="ratting !== 'bad'" class="max max-bad"></i>
-                    <i v-show="ratting === 'bad'" class="max max-bad-selected"></i>
-                    <span :style="ratting == 'bad' ? 'color: #00a7a3' : void 0">差评</span>
+                <div class="item" >
+                    <i v-show="ratting !== 'BAD'" class="max max-bad"></i>
+                    <i v-show="ratting === 'BAD'" class="max max-bad-selected"></i>
+                    <span :style="ratting == 'BAD' ? 'color: #00a7a3' : void 0">差评</span>
                 </div>
             </div>
         </div>
@@ -75,35 +75,46 @@
                 <yd-textarea slot="right" maxlength="140" v-html="postInfo.coment" :readonly="true" style="text-align: left"></yd-textarea>
             </yd-cell-item>
         </yd-cell-group>
-
-        <div class="posts-btn-con">
-            <yd-button @click.native="commit" class="posts-btn" size="large" type="primary" bgcolor="#00A7A3" color="#fff">提交</yd-button>
-        </div>
     </div>
 </template>
 <script>
+    import { getReportDetail } from '../../api/api'
+
     export default {
+        created() {
+            getReportDetail(this.$route.params.id)
+                .then(res => this.postInfo = res.body.data)
+                .then(data => {
+                    switch (this.postInfo.taskStatus) {
+                        case 'UNKNOWN':
+                            this.postInfo.taskStatus = '未知'
+                            break;
+                        case 'WAITALLOT':
+                            this.postInfo.taskStatus = '待分配'
+                            break;
+                        case 'WAITEXECUTOR':
+                            this.postInfo.taskStatus = '待处理'
+                            break;
+                        case 'WAITCOMMENT':
+                            this.postInfo.taskStatus = '待评价'
+                            break;
+                        case 'FINISH':
+                            this.postInfo.taskStatus = '已完成'
+                            break;
+                        case 'ISCLOSE':
+                            this.postInfo.taskStatus = '已关闭'
+                            break;
+                    }
+                })
+        },
         data() {
             return {
-                ratting: 'good',
-                postInfo: {
-                    status: '已关闭',
-                    contacts: '李四',
-                    phone: '186-2938-4099',
-                    position: '上海市曲阳路888号',
-                    deviceType: '门禁',
-                    detail: '门禁坏了，进不去！',
-                    imgUrls: [],
-                    coment: '世纪花园16#水电出现问题，排水管道修理。世纪花园16#水电出现问题，排水管道修理。世纪花园16#水电出现问题，排水管道修理。世纪花园16#水电出现问题，排水管道修理。世纪花园16#水电出现问题，排水管道修理。世纪花园16#水电出现问题，排水管道修理。世纪花园16#水电出现世纪花'
-                },
+                ratting: 'GOOD',
+                postInfo: {},
             }
         },
         components: {},
-        methods: {
-            commit() {
-
-            }
-        }
+        methods: {}
     }
 </script>
 <style scoped lang="stylus" rel="stylesheet/stylus">

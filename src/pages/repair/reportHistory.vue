@@ -3,16 +3,19 @@
         <yd-infinitescroll :on-infinite="loadList" :distance="50" ref="infinitescrollDemo">
 
             <yd-list slot="list">
-                <router-link :to="`/report/${item.status}/${item.id}`" v-for="(item, idx) in list" :key="idx">
+                <div v-for="(item, idx) in list" :key="idx" @click="jumpPage(item.taskStatus, item.id)">
                     <div class="history-con">
                         <div class="title">{{item.title}}</div>
-                        <div class="content">{{item.content}}</div>
-                        <div class="datetime">{{item.datetime}}</div>
-                        <div v-if="item.status == 'pending'" class="status">待处理</div>
-                        <div v-if="item.status == 'closed'" class="status" style="color: #999;">已关闭</div>
-                        <div v-if="item.status == 'coment'" class="status">待评价</div>
+                        <div class="content">{{item.description}}</div>
+                        <div class="datetime">{{item.createTime}}</div>
+                        <div v-if="item.taskStatus == 'UNKNOWN'" class="status">未知</div>
+                        <div v-if="item.taskStatus == 'WAITALLOT'" class="status">待分配</div>
+                        <div v-if="item.taskStatus == 'WAITEXECUTOR'" class="status">待处理</div>
+                        <div v-if="item.taskStatus == 'WAITCOMMENT'" class="status">待评价</div>
+                        <div v-if="item.taskStatus == 'FINISH'" class="status">已完成</div>
+                        <div v-if="item.taskStatus == 'ISCLOSE'" class="status" style="color: #999;">已关闭</div>
                     </div>
-                </router-link>
+                </div>
             </yd-list>
 
             <!-- 数据全部加载完毕显示 -->
@@ -24,104 +27,71 @@
         </yd-infinitescroll>
 
         <div class="posts-btn-con">
-            <yd-button @click.native="newPosts" class="posts-btn" size="large" type="primary" bgcolor="#00A7A3" color="#fff">新建维修申报</yd-button>
+            <yd-button @click.native="newPosts" class="posts-btn" size="large" type="primary" bgcolor="#00A7A3"
+                       color="#fff">新建维修申报
+            </yd-button>
         </div>
     </div>
 </template>
 <script>
+    import { getReportList } from '../../api/api'
+
     export default {
+        created() {
+            this.loadList()
+        },
         components: {},
         data() {
             return {
                 page: 1,
-                pageSize: 10,
-                list: [
-                    {
-                        id: 1,
-                        title: "物业水电维修",
-                        content: '世纪花园16#水电出现问题，排水管道修理。世纪花园16#水电出现问题，排水管道修理。世纪花园16#水电出现问题，排水管道修理。世纪花园16#水电出现问题，排水管道修理。',
-                        datetime: '2016-09-10 10:00:00',
-                        status: 'pending'
-                    },
-                    {
-                        id: 2,
-                        title: "商标注册",
-                        content: '浦东新区商标注册业务',
-                        datetime: '2016-09-10 10:00:00',
-                        status: 'closed'
-                    },
-                    {
-                        id: 3,
-                        title: "物业水电维修",
-                        content: '世纪花园16#水电出现问题，排水管道修理。世纪花园16#水电出现问题，排水管道修理。世纪花园16#水电出现问题，排水管道修理。世纪花园16#水电出现问题，排水管道修理。',
-                        datetime: '2016-09-10 10:00:00',
-                        status: 'coment'
-                    },
-                    {
-                        id: 4,
-                        title: "物业水电维修",
-                        content: '世纪花园16#水电出现问题，排水管道修理。',
-                        datetime: '2016-09-10 10:00:00',
-                        status: 'pending'
-                    },
-                    {
-                        id: 1,
-                        title: "物业水电维修",
-                        content: '世纪花园16#水电出现问题，排水管道修理。世纪花园16#水电出现问题，排水管道修理。世纪花园16#水电出现问题，排水管道修理。世纪花园16#水电出现问题，排水管道修理。',
-                        datetime: '2016-09-10 10:00:00',
-                        status: 'pending'
-                    },
-                    {
-                        id: 2,
-                        title: "商标注册",
-                        content: '浦东新区商标注册业务',
-                        datetime: '2016-09-10 10:00:00',
-                        status: 'closed'
-                    },
-                    {
-                        id: 3,
-                        title: "物业水电维修",
-                        content: '世纪花园16#水电出现问题，排水管道修理。世纪花园16#水电出现问题，排水管道修理。世纪花园16#水电出现问题，排水管道修理。世纪花园16#水电出现问题，排水管道修理。',
-                        datetime: '2016-09-10 10:00:00',
-                        status: 'coment'
-                    },
-                    {
-                        id: 4,
-                        title: "物业水电维修",
-                        content: '世纪花园16#水电出现问题，排水管道修理。',
-                        datetime: '2016-09-10 10:00:00',
-                        status: 'pending'
-                    }
-                ]
+                limit: 10,
+                list: []
             }
         },
         methods: {
             loadList() {
-                console.log(this.$http.jsonp);
-                this.$http.jsonp('http://list.ydui.org/getdata.php?type=backposition', {
-                    params: {
-                        page: this.page,
-                        pagesize: this.pageSize
-                    }
-                }).then(function (response) {
-                    const _list = response.body;
+                getReportList({
+                    page: this.page,
+                    limit: this.limit
+                })
+                    .then(response => {
+                        const _list = response.body.data.items
 
-                    this.list = [...this.list, ..._list];
+                        this.list = [...this.list, ..._list]
 
-                    if (_list.length < this.pageSize || this.page == 3) {
-                        /* 所有数据加载完毕 */
-                        this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.loadedDone');
-                        return;
-                    }
+                        if (_list.length < this.limit) {
+                            /* 所有数据加载完毕 */
+                            this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.loadedDone')
+                            return
+                        }
 
-                    /* 单次请求数据完毕 */
-                    this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.finishLoad');
+                        /* 单次请求数据完毕 */
+                        this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.finishLoad')
 
-                    this.page++;
-                });
+                        this.page++
+                    });
             },
             newPosts() {
                 this.$router.push('/report/posts')
+            },
+            jumpPage(status, id) {
+                switch (status) {
+                    case 'WAITALLOT':
+                        this.$router.push(`/report/pending/${id}`)
+                        break;
+                    case 'WAITEXECUTOR':
+                        this.$router.push(`/report/pending/${id}`)
+                        break;
+                    case 'WAITCOMMENT':
+                        this.$router.push(`/report/coment/${id}`)
+                        break;
+                    case 'FINISH':
+                        this.$router.push(`/report/closed/${id}`)
+                        break;
+                    case 'ISCLOSE':
+                        this.$router.push(`/report/closed/${id}`)
+                        break;
+                }
             }
         }
     }

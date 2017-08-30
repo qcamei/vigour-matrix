@@ -37,9 +37,7 @@
                 <span slot="left">设备类型</span>
                 <yd-input
                     slot="right"
-                    ref="input3"
                     v-model="postInfo.deviceType"
-                    required
                     placeholder="请输入设备类型"
                 ></yd-input>
             </yd-cell-item>
@@ -91,6 +89,8 @@
     </div>
 </template>
 <script>
+    import {newPostReport} from '../../api/api'
+
     export default {
         data() {
             return {
@@ -98,13 +98,13 @@
                     contacts: '',
                     phone: '',
                     position: '',
-                    deviceType: ''
+                    deviceType: '',
                 },
                 status: 'ready',
                 files: [],
                 point: {},
                 uploading: false,
-                percent: 0
+                percent: 0,
             }
         },
         components: {},
@@ -113,6 +113,7 @@
                 this.$refs.file.click()
             },
             submit() {
+                var _this = this
                 if (this.files.length === 0) {
                     console.warn('no file!');
                     return
@@ -123,14 +124,16 @@
                 })
                 const xhr = new XMLHttpRequest()
                 xhr.upload.addEventListener('progress', this.uploadProgress, false)
-                xhr.open('POST', '/api/imgs', true)
+                xhr.open('POST', '/platform/image', true)
                 this.uploading = true
                 xhr.send(formData)
+                xhr.responseType = 'json'
                 xhr.onload = () => {
                     this.uploading = false
                     if (xhr.status === 200 || xhr.status === 304) {
                         this.status = 'finished'
                         console.log('upload success!')
+                        _this.$emit('uploadend', xhr.response.data)
                     } else {
                         console.log(`error：error code ${xhr.status}`)
                     }
@@ -159,7 +162,7 @@
                 this.$refs.file.value = ''
             },
             // 将图片文件转成BASE64格式
-            html5Reader(file, item){
+            html5Reader(file, item) {
                 const reader = new FileReader()
                 reader.onload = (e) => {
                     this.$set(item, 'src', e.target.result)
@@ -168,7 +171,7 @@
             },
             isContain(file) {
                 this.files.forEach((item) => {
-                    if(item.name === file.name && item.size === file.size) {
+                    if (item.name === file.name && item.size === file.size) {
                         return true
                     }
                 })
@@ -187,8 +190,7 @@
                 this.$router.go(-1)
             },
             commit() {
-                this.submit()
-                for (let i = 0; i < 4; i++) {
+                for (let i = 0; i < 3; i++) {
                     var validFlag = this.$refs['input' + i].valid
                     if (!validFlag) {
                         this.$dialog.toast({
@@ -198,7 +200,47 @@
                         return;
                     }
                 }
-                console.log(this.$refs.textarea.$el.firstChild.value)
+
+                if (this.files.length) {
+                    this.submit()
+
+                    this.$on('uploadend', function (data) {
+                        newPostReport({
+                            ...this.postInfo,
+                            description: this.$refs.textarea.$el.firstChild.value,
+                            imageInfoList: data.map(item => {
+                                return {path: item}
+                            })
+                        })
+                            .then(res => {
+                                if (res.body.code == 200) {
+                                    this.$dialog.toast({
+                                        mes: '申报成功',
+                                        timeout: 500,
+                                        callback: () => {
+                                            this.$router.replace('/report/history')
+                                        }
+                                    })
+                                }
+                            })
+                    })
+                } else {
+                    newPostReport({
+                        ...this.postInfo,
+                        description: this.$refs.textarea.$el.firstChild.value,
+                    })
+                        .then(res => {
+                            if (res.body.code == 200) {
+                                this.$dialog.toast({
+                                    mes: '申报成功',
+                                    timeout: 500,
+                                    callback: () => {
+                                        this.$router.replace('/report/history')
+                                    }
+                                })
+                            }
+                        })
+                }
             }
         }
     }
