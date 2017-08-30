@@ -15,7 +15,7 @@
             </yd-cell-item>
             <yd-cell-item>
                 <span slot="left" class="label-text">会议室设备</span>
-                <div slot="right" class="value-text">
+                <div slot="right" class="value-text" style="height: 1rem; line-height: 1rem">
                     <ul class="device-list">
                         <li>投影设备</li>
                         <li>液晶电视</li>

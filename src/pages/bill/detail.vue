@@ -4,7 +4,6 @@
             <span slot="left">合同号</span>
             <input
                 slot="right"
-                :showClearIcon="false"
                 v-model="info.number"
                 style="color: #999; text-align: right"
                 readonly />
@@ -14,7 +13,6 @@
             <span slot="left">账单期间</span>
             <input
                 slot="right"
-                :showClearIcon="false"
                 v-model="info.date"
                 style="color: #999; text-align: right"
                 readonly />
@@ -74,6 +72,16 @@
             </div>
         </div>
 
+        <yd-cell-item style="margin-bottom: .2rem; background-color: #fff">
+            <span slot="left">会议室设备</span>
+            <div slot="right" style="height: 1rem; line-height: 1rem">
+                <ul class="device-list">
+                    <li>商用出租</li>
+                    <li>广告出租</li>
+                </ul>
+            </div>
+        </yd-cell-item>
+
         <div class="posts-btn-con">
             <yd-button @click.native="commit" class="posts-btn" size="large" type="primary" bgcolor="#00A7A3"
                        color="#fff">支付凭证上传
@@ -110,7 +118,7 @@
                 width 100%
                 height 100%
                 margin-bottom .2rem
-                padding 0 .2rem .2rem
+                padding .2rem
                 background-color #f5f4f9
                 &:last-child
                     margin-bottom 0
@@ -126,6 +134,12 @@
                     align-items center
                     font-size .26rem
                     color #333
+    .device-list
+        overflow hidden
+        li
+            float left
+            margin 0 .06rem
+            color #999
     .posts-btn-con
         position fixed
         bottom 0
