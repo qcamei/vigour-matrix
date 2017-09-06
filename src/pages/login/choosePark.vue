@@ -6,42 +6,68 @@
             fontsize=".36rem"
         ></yd-navbar>
 
-        <yd-cell-group>
+        <yd-cell-group v-for="(item, idx) in newCompanyArr" :key="idx">
             <yd-cell-item>
                 <span slot="left">所属园区</span>
-                <span slot="right">Park1</span>
+                <span slot="right">{{ item.parkName }}</span>
             </yd-cell-item>
             <yd-cell-item>
                 <span slot="left">用户名</span>
-                <span slot="right">李四</span>
+                <span slot="right">{{ item.userName }}</span>
             </yd-cell-item>
             <div class="cell-item choose-btn-con">
-                <yd-button type="primary">选择登录</yd-button>
-            </div>
-        </yd-cell-group>
-
-        <yd-cell-group>
-            <yd-cell-item>
-                <span slot="left">所属园区</span>
-                <span slot="right">Park2</span>
-            </yd-cell-item>
-            <yd-cell-item>
-                <span slot="left">用户名</span>
-                <span slot="right">马五</span>
-            </yd-cell-item>
-            <div class="cell-item choose-btn-con">
-                <yd-button type="primary">选择登录</yd-button>
+                <yd-button type="primary" @click.native="chooseLogin(item.tempTokenKey)">选择登录</yd-button>
             </div>
         </yd-cell-group>
     </div>
 </template>
 <script>
+    import { chooseAndBind } from '../../api/api'
+    import { getUrlparams } from '../../common/js/utils'
+
     export default {
+        created() {
+            this.hasBindCompany = JSON.parse(sessionStorage.getItem('hasBindCompany'))
+            this.type = getUrlparams().type
+        },
+        watch: {
+            hasBindCompany(newArr, oldArr) {
+                this.newCompanyArr = newArr
+            }
+        },
         data() {
-            return {}
+            return {
+                hasBindCompany: [],
+                newCompanyArr: [],
+                type: ''
+            }
         },
         components: {},
-        methods: {}
+        methods: {
+            chooseLogin(tempTokenKey) {
+                chooseAndBind(tempTokenKey).then(res => {
+                    if (res.body.code == 200) {
+                        this.switchRedirect()
+                    }
+                })
+            },
+            switchRedirect() {
+                switch (this.type) {
+                    case '1':
+                        this.$router.replace('/report/history')
+                        break;
+                    case '2':
+                        this.$router.replace('/meeting/list')
+                        break;
+                    case '3':
+                        this.$router.replace('/community/list')
+                        break;
+                    case '4':
+                        this.$router.replace('/bill/list')
+                        break;
+                }
+            }
+        }
     }
 </script>
 <style scoped lang="stylus" rel="stylesheet/stylus">

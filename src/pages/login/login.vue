@@ -29,7 +29,9 @@
                     ></yd-sendcode>
 
                 </yd-cell-item>
-                <yd-button class="logo-btn" size="large" type="primary" bgcolor="#00A7A3" color="#fff" @click.native="login">登录</yd-button>
+                <yd-button class="logo-btn" size="large" type="primary" bgcolor="#00A7A3" color="#fff"
+                           @click.native="login">登录
+                </yd-button>
             </yd-cell-group>
         </div>
     </div>
@@ -119,8 +121,9 @@
                                     this.$dialog.toast({mes: res.body.message, timeout: 500})
                                 }
                             })
-                        } else {
+                        } else if (result.data && result.data.length > 0) {
                             // 手机号绑定过园区，进入选择园区登录
+                            window.sessionStorage.setItem('hasBindCompany', JSON.stringify(result.data))
                             this.$router.push('/choose-park')
                         }
                     }
@@ -149,10 +152,13 @@
     .out-con
         height 100%
         background #fff !important
+
     .m-cell:after
         border-bottom 1px solid #111 !important
+
     .hairline .btn-hollow
         border none
+
     .logo-con
         width 100%
         height 3.5rem
@@ -162,6 +168,7 @@
         img
             width 4.4rem
             height 1rem
+
     .main-con
         padding 0 .2rem
         .logo-btn

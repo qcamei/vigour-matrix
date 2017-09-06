@@ -39,7 +39,7 @@
 </template>
 <script>
     import moment from 'moment'
-    import { orderHistoryList } from '../../api/api'
+    import { orderHistoryList, cancelMeetingOrder } from '../../api/api'
 
     export default {
         created() {
@@ -57,7 +57,28 @@
         components: {},
         methods: {
             cancel() {
+                this.$dialog.loading.open('取消中')
 
+                cancelMeetingOrder(this.$route.params.orderId)
+                    .then(res => {
+                        if (res.body.code == 200) {
+                            this.$dialog.loading.close()
+                            this.$dialog.toast({
+                                mes: '取消成功',
+                                timeout: 800,
+                                callback: () => {
+                                    this.$router.replace('/meeting/list')
+                                }
+                            })
+                        } else {
+                            this.$dialog.loading.close()
+                            this.$dialog.toast({
+                                mes: res.body.message,
+                                timeout: 800
+                            })
+                        }
+                    })
+                    .catch(e => console.log(e))
             }
         }
     }

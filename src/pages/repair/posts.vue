@@ -2,10 +2,20 @@
     <div id="post-con">
         <yd-cell-group id="input-group" style="margin-bottom: .24rem">
             <yd-cell-item>
-                <span slot="left">联系人</span>
+                <span slot="left">申报概述</span>
                 <yd-input
                     slot="right"
                     ref="input0"
+                    v-model="postInfo.title"
+                    required
+                    placeholder="请输入申报概述"
+                ></yd-input>
+            </yd-cell-item>
+            <yd-cell-item>
+                <span slot="left">联系人</span>
+                <yd-input
+                    slot="right"
+                    ref="input1"
                     v-model="postInfo.contacts"
                     required
                     placeholder="请输入联系人姓名"
@@ -15,7 +25,7 @@
                 <span slot="left">联系电话</span>
                 <yd-input
                     slot="right"
-                    ref="input1"
+                    ref="input2"
                     type="number"
                     v-model="postInfo.phone"
                     regex="mobile"
@@ -27,7 +37,7 @@
                 <span slot="left">位置</span>
                 <yd-input
                     slot="right"
-                    ref="input2"
+                    ref="input3"
                     v-model="postInfo.position"
                     required
                     placeholder="请输入位置"
@@ -95,6 +105,7 @@
         data() {
             return {
                 postInfo: {
+                    title: '',
                     contacts: '',
                     phone: '',
                     position: '',
@@ -190,7 +201,7 @@
                 this.$router.go(-1)
             },
             commit() {
-                for (let i = 0; i < 3; i++) {
+                for (let i = 0; i < 4; i++) {
                     var validFlag = this.$refs['input' + i].valid
                     if (!validFlag) {
                         this.$dialog.toast({
@@ -200,6 +211,8 @@
                         return;
                     }
                 }
+
+                this.$dialog.loading.open('发送中')
 
                 if (this.files.length) {
                     this.submit()
@@ -214,6 +227,7 @@
                         })
                             .then(res => {
                                 if (res.body.code == 200) {
+                                    this.$dialog.loading.close()
                                     this.$dialog.toast({
                                         mes: '申报成功',
                                         timeout: 500,
@@ -231,6 +245,7 @@
                     })
                         .then(res => {
                             if (res.body.code == 200) {
+                                this.$dialog.loading.close()
                                 this.$dialog.toast({
                                     mes: '申报成功',
                                     timeout: 500,

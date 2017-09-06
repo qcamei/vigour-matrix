@@ -1,6 +1,6 @@
 <template>
     <div id="apply-con">
-        <div class="title">{{ infos.title }}</div>
+        <div class="title">{{ title }}</div>
 
         <yd-cell-group id="input-group" style="margin-bottom: .24rem">
             <yd-cell-item>
@@ -8,13 +8,13 @@
                 <yd-input
                     slot="right"
                     ref="input0"
-                    v-model="infos.contact"
+                    v-model="infos.proprser"
                     required
                     placeholder="请输入联系人姓名"
                 ></yd-input>
             </yd-cell-item>
             <yd-cell-item>
-                <span slot="left">手机号码</span>
+                <span slot="left">联系电话</span>
                 <yd-input
                     slot="right"
                     ref="input1"
@@ -22,16 +22,14 @@
                     v-model="infos.phone"
                     regex="mobile"
                     required
-                    placeholder="请输入联系人手机号"
+                    placeholder="请输入联系人联系电话"
                 ></yd-input>
             </yd-cell-item>
             <yd-cell-item>
                 <span slot="left">公司名称</span>
                 <yd-input
                     slot="right"
-                    ref="input2"
-                    v-model="infos.company"
-                    required
+                    v-model="infos.companyName"
                     placeholder="请输入公司名称"
                 ></yd-input>
             </yd-cell-item>
@@ -39,9 +37,7 @@
                 <span slot="left">职务</span>
                 <yd-input
                     slot="right"
-                    ref="input3"
-                    v-model="infos.job"
-                    required
+                    v-model="infos.position"
                     placeholder="请输入职务"
                 ></yd-input>
             </yd-cell-item>
@@ -49,10 +45,9 @@
                 <span slot="left">人数</span>
                 <yd-input
                     slot="right"
-                    ref="input4"
                     type="number"
-                    v-model="infos.count"
-                    required
+                    v-model="infos.num"
+                    ref="input2"
                     regex="^\+?[1-9]\d*$"
                     placeholder="请输入人数"
                 ></yd-input>
@@ -75,18 +70,27 @@
     </div>
 </template>
 <script>
+    import { getCommunityDetail, commitCommunityPosts } from '../../api/api'
+
     export default {
+        created() {
+            getCommunityDetail(this.$route.params.eventId).then(res => {
+                this.infos.communityId = res.body.data.id
+                this.title = res.body.data.title
+            })
+        },
         data() {
             return {
                 infos: {
-                    id: 1,
-                    title: '上海秋季全程马拉松赛',
-                    contact: '',
+                    communityId: '',
+                    proprser: '',
                     phone: '',
-                    company: '',
-                    job: '',
-                    count: ''
-                }
+                    num: '',
+                    describle: '',
+                    companyName: '',
+                    position: ''
+                },
+                title: '',
             }
         },
         components: {},
@@ -95,7 +99,7 @@
                 this.$router.go(-1)
             },
             commit() {
-                for (let i = 0; i < 5; i++) {
+                for (let i = 0; i < 3; i++) {
                     var validFlag = this.$refs['input' + i].valid
                     if (!validFlag) {
                         this.$dialog.toast({
@@ -105,7 +109,31 @@
                         return;
                     }
                 }
-                console.log(this.$refs.textarea.$el.firstChild.value)
+
+                this.$dialog.loading.open('发送中')
+
+                this.infos.describle = this.$refs.textarea.$el.firstChild.value
+
+                commitCommunityPosts(this.infos)
+                    .then(res => {
+                        if (res.body.code == 200) {
+                            this.$dialog.loading.close()
+                            this.$dialog.toast({
+                                mes: '申请成功',
+                                timeout: 800,
+                                callback: () => {
+                                    this.$router.replace('/community/list')
+                                }
+                            })
+                        } else {
+                            this.$dialog.loading.close()
+                            this.$dialog.toast({
+                                mes: res.body.message,
+                                timeout: 800
+                            })
+                        }
+                    })
+                    .catch(e => console.log(e))
             }
         }
     }
@@ -114,11 +142,17 @@
     #apply-con
         padding-bottom 1.4rem
         .title
+            box-sizing border-box
+            padding 0 .2rem
             height 1.22rem
             line-height 1.22rem
             text-align center
             font-size .3rem
             color #00a7a3
+            width 100%
+            text-overflow ellipsis
+            overflow hidden
+            white-space nowrap
         #input-group
             input
                 text-align right

@@ -35,11 +35,6 @@
 </template>
 <script>
     import { getReportList } from '../../api/api'
-    import { getUrlparams } from '../../common/js/utils'
-    const codeInfo = {
-        parkCode: getUrlparams().parkCode,
-        code: getUrlparams().code
-    }
 
     export default {
         created() {
@@ -55,6 +50,7 @@
         },
         methods: {
             loadList() {
+                this.$dialog.loading.open('加载中')
                 getReportList({
                     page: this.page,
                     limit: this.limit
@@ -68,12 +64,13 @@
                         if (_list.length < this.limit) {
                             /* 所有数据加载完毕 */
                             this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.loadedDone')
+                            this.$dialog.loading.close()
                             return
                         }
 
                         /* 单次请求数据完毕 */
                         this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.finishLoad')
-
+                        this.$dialog.loading.close()
                         this.page++
                     }).catch(e => console.log(e))
             },

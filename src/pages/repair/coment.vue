@@ -7,6 +7,10 @@
                        readonly>
             </yd-cell-item>
             <yd-cell-item>
+                <span slot="left">申报概述</span>
+                <input slot="right" :showClearIcon="false"  v-model="postInfo.title" readonly>
+            </yd-cell-item>
+            <yd-cell-item>
                 <span slot="left">联系人</span>
                 <input slot="right" :showClearIcon="false" v-model="postInfo.contacts" readonly>
             </yd-cell-item>
@@ -59,14 +63,14 @@
                     <span :style="ratting == 'GOOD' ? 'color: #00a7a3' : void 0">好评</span>
                 </div>
                 <div class="item" @click="ratting = 'NORMAL'">
-                    <i v-show="ratting !== 'NORMAL'" class="max max-normal"></i>
-                    <i v-show="ratting === 'NORMAL'" class="max max-normal-selected"></i>
-                    <span :style="ratting == 'NORMAL' ? 'color: #00a7a3' : void 0">中评</span>
+                    <i v-show="ratting !== 'MEDIUM'" class="max max-normal"></i>
+                    <i v-show="ratting === 'MEDIUM'" class="max max-normal-selected"></i>
+                    <span :style="ratting == 'MEDIUM' ? 'color: #00a7a3' : void 0">中评</span>
                 </div>
-                <div class="item" @click="ratting = 'BAD'">
-                    <i v-show="ratting !== 'BAD'" class="max max-bad"></i>
-                    <i v-show="ratting === 'BAD'" class="max max-bad-selected"></i>
-                    <span :style="ratting == 'BAD' ? 'color: #00a7a3' : void 0">差评</span>
+                <div class="item" @click="ratting = 'NEGATIVE'">
+                    <i v-show="ratting !== 'NEGATIVE'" class="max max-bad"></i>
+                    <i v-show="ratting === 'NEGATIVE'" class="max max-bad-selected"></i>
+                    <span :style="ratting == 'NEGATIVE' ? 'color: #00a7a3' : void 0">差评</span>
                 </div>
             </div>
         </div>

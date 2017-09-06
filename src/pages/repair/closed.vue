@@ -6,6 +6,10 @@
                 <input slot="right" :showClearIcon="false" v-model="postInfo.taskStatus" style="color: #e65966;" readonly>
             </yd-cell-item>
             <yd-cell-item>
+                <span slot="left">申报概述</span>
+                <input slot="right" :showClearIcon="false"  v-model="postInfo.title" readonly>
+            </yd-cell-item>
+            <yd-cell-item>
                 <span slot="left">联系人</span>
                 <input slot="right" :showClearIcon="false" v-model="postInfo.contacts" readonly>
             </yd-cell-item>
@@ -53,26 +57,26 @@
             <span class="tit">服务评价</span>
             <div class="icon-group">
                 <div class="item" >
-                    <i v-show="ratting !== 'GOOD'" class="max max-good"></i>
-                    <i v-show="ratting === 'GOOD'" class="max max-good-selected"></i>
-                    <span :style="ratting == 'GOOD' ? 'color: #00a7a3' : void 0">好评</span>
+                    <i v-show="postInfo.commentGrade !== 'GOOD'" class="max max-good"></i>
+                    <i v-show="postInfo.commentGrade === 'GOOD'" class="max max-good-selected"></i>
+                    <span :style="postInfo.commentGrade == 'GOOD' ? 'color: #00a7a3' : void 0">好评</span>
                 </div>
                 <div class="item" >
-                    <i v-show="ratting !== 'NORMAL'" class="max max-normal"></i>
-                    <i v-show="ratting === 'NORMAL'" class="max max-normal-selected"></i>
-                    <span :style="ratting == 'NORMAL' ? 'color: #00a7a3' : void 0">中评</span>
+                    <i v-show="postInfo.commentGrade !== 'MEDIUM'" class="max max-normal"></i>
+                    <i v-show="postInfo.commentGrade === 'MEDIUM'" class="max max-normal-selected"></i>
+                    <span :style="postInfo.commentGrade == 'MEDIUM' ? 'color: #00a7a3' : void 0">中评</span>
                 </div>
                 <div class="item" >
-                    <i v-show="ratting !== 'BAD'" class="max max-bad"></i>
-                    <i v-show="ratting === 'BAD'" class="max max-bad-selected"></i>
-                    <span :style="ratting == 'BAD' ? 'color: #00a7a3' : void 0">差评</span>
+                    <i v-show="postInfo.commentGrade !== 'NEGATIVE'" class="max max-bad"></i>
+                    <i v-show="postInfo.commentGrade === 'NEGATIVE'" class="max max-bad-selected"></i>
+                    <span :style="postInfo.commentGrade == 'NEGATIVE' ? 'color: #00a7a3' : void 0">差评</span>
                 </div>
             </div>
         </div>
 
         <yd-cell-group>
             <yd-cell-item>
-                <yd-textarea slot="right" maxlength="140" v-html="postInfo.coment" :readonly="true" style="text-align: left"></yd-textarea>
+                <yd-textarea slot="right" maxlength="140" v-html="postInfo.commentContent" :readonly="true" style="text-align: left"></yd-textarea>
             </yd-cell-item>
         </yd-cell-group>
     </div>

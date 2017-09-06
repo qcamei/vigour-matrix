@@ -115,6 +115,8 @@
                     }
                 }
 
+                this.$dialog.loading.open('发送中')
+
                 commitMeetingOrder({
                     resourceId: this.$route.params.id,
                     name: this.info.name,
@@ -128,6 +130,7 @@
                 })
                     .then(res => {
                         if (res.body.code == 200) {
+                            this.$dialog.loading.close()
                             return this.$dialog.toast({
                                 mes: '预定成功',
                                 timeout: 800,
@@ -135,9 +138,8 @@
                                     this.$router.replace('/meeting/list')
                                 }
                             })
-                        }
-
-                        if (res.body.code == 20030) {
+                        } else {
+                            this.$dialog.loading.close()
                             return this.$dialog.toast({
                                 mes: res.body.message,
                                 timeout: 800

@@ -6,17 +6,21 @@
                 <router-link :to="`/community/history/detail/${item.id}`" v-for="(item, idx) in list" :key="idx">
                     <div class="history-con">
                         <div class="img-con">
-                            <img :src="item.image" />
+                            <img :src="item.mainImage.length ? item.mainImage[0].path : void 0" />
                         </div>
                         <div class="disc-con">
                             <div class="top">
-                                <div class="title">{{item.title}}</div>
+                                <div class="title">{{item.communityTitle}}</div>
 
-                                <div v-if="item.status == 'pending'" class="status">待审批</div>
-                                <div v-if="item.status == 'end'" class="status" style="color: #999;">已审批</div>
+                                <div v-if="item.approvalStatus == 'UNKNOWN'" class="status">未知</div>
+                                <div v-if="item.approvalStatus == 'WAITSUBMIT'" class="status">待提交</div>
+                                <div v-if="item.approvalStatus == 'WAITAPPROVAL'" class="status">待审批</div>
+                                <div v-if="item.approvalStatus == 'ALREADYPASS'" class="status">已通过</div>
+                                <div v-if="item.approvalStatus == 'NOPASS'" class="status">未通过</div>
+                                <div v-if="item.approvalStatus == 'TERMINATION'" class="status">已终止</div>
                             </div>
                             <div class="bottom">
-                                <div class="datetime">{{item.datetime}}</div>
+                                <div class="datetime">{{item.createTime}}</div>
                             </div>
                         </div>
                     </div>
@@ -33,12 +37,18 @@
     </div>
 </template>
 <script>
+    import { getCommunityHistoryList } from '../../api/api'
+
     export default {
+        created() {
+            this.loadList()
+        },
         data() {
             return {
                 page: 1,
-                pageSize: 10,
-                list: [
+                limit: 10,
+                list: [],
+                lists: [
                     {
                         id: 1,
                         title: '华谊星程大厦注册公司',
@@ -73,18 +83,15 @@
         components: {},
         methods: {
             loadList() {
-                console.log(this.$http.jsonp);
-                this.$http.jsonp('http://list.ydui.org/getdata.php?type=backposition', {
-                    params: {
-                        page: this.page,
-                        pagesize: this.pageSize
-                    }
-                }).then(function (response) {
-                    const _list = response.body;
+                getCommunityHistoryList({
+                    page: this.page,
+                    limit: this.limit
+                }).then(response => {
+                    const _list = response.body.data.items;
 
                     this.list = [...this.list, ..._list];
 
-                    if (_list.length < this.pageSize || this.page == 3) {
+                    if (_list.length < this.limit || this.page == 3) {
                         /* 所有数据加载完毕 */
                         this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.loadedDone');
                         return;

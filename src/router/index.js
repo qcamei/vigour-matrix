@@ -94,7 +94,7 @@ export default new Router({
             path: '/choose-park',
             component: ChoosePark,
             meta: {
-                title: '登录'
+                title: '绑定用户'
             }
         },
         {

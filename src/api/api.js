@@ -1,11 +1,6 @@
 import Vue from 'vue'
 import { baseURL } from './config'
 
-// const codeInfo = {
-//     parkCode: '170124153115071651',
-//     code: 'ohmqnwW5xCNCvpII_ira-TJqGSak'
-// }
-
 /**
  * 发送验证码
  * @param cellPhone 手机号 String
@@ -30,12 +25,24 @@ export const toLogin = function (obj) {
 
 /**
  * 手机号没有绑定过园区，直接绑定当前园区后登录
- * @param obj
- * @returns {*} Object {cellphone: '', phoneCode: '', parkCode: ''}
+ * @param obj Object {cellphone: '', phoneCode: '', parkCode: ''}
+ * @returns {*}
  */
 export const justBindPhone = function (obj) {
     return Vue.http.post(baseURL + '/wechat/phoneCode/binding', {
         ...obj
+    })
+}
+
+/**
+ * 选择园区后登录
+ * @param tempTokenKey String "1670686445"
+ */
+export const chooseAndBind = function (tempTokenKey) {
+    return Vue.http.get(baseURL + '/wechat/phoneCode/binding', {
+        params: {
+            tempTokenKey
+        }
     })
 }
 
@@ -74,6 +81,14 @@ export const orderHistoryList = function (obj) {
             ...obj
         }
     })
+}
+
+/**
+ * 取消预定
+ * @param id
+ */
+export const cancelMeetingOrder = function (id) {
+    return Vue.http.put(baseURL + '/wechat/mettingReserve/cancle/' + id)
 }
 
 /**
@@ -116,5 +131,70 @@ export const makeComment = function (obj, id) {
 export const newPostReport = function (obj) {
     return Vue.http.post(baseURL + '/wechat/task' ,{
         ...obj
+    })
+}
+
+/**
+ * 社群活动列表
+ * @param obj Object {page: 1, limit: 5}
+ * @returns {*}
+ */
+export const getCommunityList = function (obj) {
+    return Vue.http.get(baseURL + '/wechat/community', {
+        params: {
+            ...obj
+        }
+    })
+}
+
+/**
+ * 社群活动申请历史纪录列表
+ * @param obj Object {page: 1, limit: 10}
+ * @returns {*}
+ */
+export const getCommunityHistoryList = function (obj) {
+    return Vue.http.get(baseURL + '/wechat/communityApply', {
+        params: {
+            ...obj
+        }
+    })
+}
+
+/**
+ * 社群活动详情
+ * @param id 活动id
+ */
+export const getCommunityDetail = function (id) {
+    return Vue.http.get(baseURL + '/wechat/community/' + id)
+}
+
+/**
+ * 社群活动提交活动申请
+ * @param obj
+ * @returns {*}
+ */
+export const commitCommunityPosts = function (obj) {
+    return Vue.http.post(baseURL + '/wechat/communityApply', {
+        ...obj
+    })
+}
+
+/**
+ * 社群活动我的历史申请活动详情
+ * @param id
+ */
+export const getCommunityHistoryDetail = function (id) {
+    return Vue.http.get(baseURL + '/wechat/communityApply/' + id)
+}
+
+/**
+ * 企业账单列表
+ * @param obj {page: 1, limit: 10}
+ */
+export const getBillList = function (obj) {
+    return Vue.http.get(baseURL + '/wechat/billInfo/pushed', {
+        params: {
+            ...obj
+        }
     })
 }

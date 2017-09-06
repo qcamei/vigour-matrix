@@ -7,7 +7,8 @@
                     <div class="history-con">
                         <div class="title-con">
                             <div class="title">{{item.title}}</div>
-                            <div class="status" :style="{color: item.status == 'pending' ? '#e65966' : void 0}" v-text="item.status == 'ok' ? '已支付' : '待支付'"></div>
+                            <div class="status" :style="{color: item.status == 'pending' ? '#e65966' : void 0}"
+                                 v-text="item.status == 'ok' ? '已支付' : '待支付'"></div>
                         </div>
                         <div class="number">合同号：{{item.number}}</div>
                         <div class="date-time">{{item.datetime}}</div>
@@ -25,11 +26,19 @@
     </div>
 </template>
 <script>
+    import {getBillList} from '../../api/api'
+
     export default {
+        created() {
+            // this.loadList()
+        },
         data() {
             return {
                 page: 1,
                 pageSize: 10,
+                page: 1,
+                limit: 10,
+                lists: [],
                 list: [
                     {
                         id: 1,
@@ -65,28 +74,26 @@
         components: {},
         methods: {
             loadList() {
-                console.log(this.$http.jsonp);
-                this.$http.jsonp('http://list.ydui.org/getdata.php?type=backposition', {
-                    params: {
-                        page: this.page,
-                        pagesize: this.pageSize
-                    }
-                }).then(function (response) {
-                    const _list = response.body;
+                getBillList({
+                    page: this.page,
+                    limit: this.limit
+                })
+                    .then(response => {
+                        const _list = response.body.data.items;
 
-                    this.list = [...this.list, ..._list];
+                        this.list = [...this.list, ..._list];
 
-                    if (_list.length < this.pageSize || this.page == 3) {
-                        /* 所有数据加载完毕 */
-                        this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.loadedDone');
-                        return;
-                    }
+                        if (_list.length < this.limit) {
+                            /* 所有数据加载完毕 */
+                            this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.loadedDone');
+                            return;
+                        }
 
-                    /* 单次请求数据完毕 */
-                    this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.finishLoad');
+                        /* 单次请求数据完毕 */
+                        this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.finishLoad');
 
-                    this.page++;
-                });
+                        this.page++;
+                    });
             }
         }
     }
