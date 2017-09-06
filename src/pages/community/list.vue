@@ -1,5 +1,6 @@
 <template>
     <div>
+
         <router-link :to="`/community/detail/${item.id}`" class="activity-item" v-for="(item, idx) in list" :key="idx">
             <div class="img-con">
                 <img
@@ -24,7 +25,13 @@
     </div>
 </template>
 <script>
+    import { getUrlparams } from '../../common/js/utils'
+
     export default {
+        created() {
+            // alert('code是： ' + getUrlparams().code)
+            this.list[0].title = getUrlparams().code
+        },
         data() {
             return {
                 list: [

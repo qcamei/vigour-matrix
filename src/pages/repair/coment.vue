@@ -8,16 +8,16 @@
             </yd-cell-item>
             <yd-cell-item>
                 <span slot="left">联系人</span>
-                <input slot="right" :showClearIcon="false" placeholder="请输入联系人姓名" v-model="postInfo.contacts" readonly>
+                <input slot="right" :showClearIcon="false" v-model="postInfo.contacts" readonly>
             </yd-cell-item>
             <yd-cell-item>
                 <span slot="left">联系电话</span>
-                <input slot="right" :showClearIcon="false" required readonly placeholder="请输入联系电话"
+                <input slot="right" :showClearIcon="false" required readonly
                        v-model="postInfo.phone">
             </yd-cell-item>
             <yd-cell-item>
                 <span slot="left">位置</span>
-                <input slot="right" required :showClearIcon="false" readonly placeholder="请输入位置"
+                <input slot="right" required :showClearIcon="false" readonly
                        v-model="postInfo.position">
             </yd-cell-item>
             <yd-cell-item>

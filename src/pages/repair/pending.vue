@@ -21,7 +21,7 @@
             </yd-cell-item>
             <yd-cell-item>
                 <span slot="left">设备类型</span>
-                <input slot="right" required :showClearIcon="false" readonly placeholder="请输入设备类型"
+                <input slot="right" required :showClearIcon="false" readonly
                        v-model="postInfo.deviceType">
             </yd-cell-item>
         </yd-cell-group>

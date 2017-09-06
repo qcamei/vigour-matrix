@@ -1,9 +1,42 @@
 import Vue from 'vue'
 import { baseURL } from './config'
 
-const codeInfo = {
-    parkCode: '170124153115071651',
-    code: 'ohmqnwW5xCNCvpII_ira-TJqGSak'
+// const codeInfo = {
+//     parkCode: '170124153115071651',
+//     code: 'ohmqnwW5xCNCvpII_ira-TJqGSak'
+// }
+
+/**
+ * 发送验证码
+ * @param cellPhone 手机号 String
+ * @returns {*}
+ */
+export const sendValidCode = function (cellPhone) {
+    return Vue.http.post(baseURL + '/wechat/phoneCode/single', {
+        cellPhone
+    })
+}
+
+/**
+ * 手机号验证码登录
+ * @param obj Object {cellphone: '', phoneCode: ''}
+ * @returns {*}
+ */
+export const toLogin = function (obj) {
+    return Vue.http.post(baseURL + '/wechat/phoneCode/check', {
+        ...obj
+    })
+}
+
+/**
+ * 手机号没有绑定过园区，直接绑定当前园区后登录
+ * @param obj
+ * @returns {*} Object {cellphone: '', phoneCode: '', parkCode: ''}
+ */
+export const justBindPhone = function (obj) {
+    return Vue.http.post(baseURL + '/wechat/phoneCode/binding', {
+        ...obj
+    })
 }
 
 /**
@@ -15,7 +48,6 @@ export const getMeetingList = function (date) {
     return Vue.http.get(baseURL + '/wechat/resourceInfo/date', {
         params: {
             date,
-            ...codeInfo
         }
     })
 }
@@ -27,7 +59,6 @@ export const getMeetingList = function (date) {
  */
 export const commitMeetingOrder = function (obj) {
     return Vue.http.post(baseURL + '/wechat/mettingReserve', {
-        ...codeInfo,
         ...obj
     })
 }
@@ -40,7 +71,6 @@ export const commitMeetingOrder = function (obj) {
 export const orderHistoryList = function (obj) {
     return Vue.http.get(baseURL + '/wechat/mettingReserve', {
         params: {
-            ...codeInfo,
             ...obj
         }
     })
@@ -53,7 +83,6 @@ export const orderHistoryList = function (obj) {
 export const getReportList = function (obj) {
     return Vue.http.get(baseURL + '/wechat/task', {
         params: {
-            ...codeInfo,
             ...obj
         }
     })
@@ -64,11 +93,7 @@ export const getReportList = function (obj) {
  * @param id 申报单号id
  */
 export const getReportDetail = function (id) {
-    return Vue.http.get(baseURL + '/wechat/task/' + id, {
-        params: {
-            ...codeInfo,
-        }
-    })
+    return Vue.http.get(baseURL + '/wechat/task/' + id)
 }
 
 /**
@@ -79,7 +104,6 @@ export const getReportDetail = function (id) {
  */
 export const makeComment = function (obj, id) {
     return Vue.http.put(baseURL + '/wechat/task/comment/' + id, {
-        ...codeInfo,
         ...obj
     })
 }
@@ -91,7 +115,6 @@ export const makeComment = function (obj, id) {
  */
 export const newPostReport = function (obj) {
     return Vue.http.post(baseURL + '/wechat/task' ,{
-        ...codeInfo,
         ...obj
     })
 }

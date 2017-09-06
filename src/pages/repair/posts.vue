@@ -89,7 +89,7 @@
     </div>
 </template>
 <script>
-    import {newPostReport} from '../../api/api'
+    import { newPostReport } from '../../api/api'
 
     export default {
         data() {
@@ -195,7 +195,7 @@
                     if (!validFlag) {
                         this.$dialog.toast({
                             mes: this.$refs['input' + i].errorMsg,
-                            timeout: 800
+                            timeout: 500
                         });
                         return;
                     }

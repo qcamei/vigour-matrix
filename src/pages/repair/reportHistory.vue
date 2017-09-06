@@ -35,6 +35,11 @@
 </template>
 <script>
     import { getReportList } from '../../api/api'
+    import { getUrlparams } from '../../common/js/utils'
+    const codeInfo = {
+        parkCode: getUrlparams().parkCode,
+        code: getUrlparams().code
+    }
 
     export default {
         created() {
@@ -55,6 +60,7 @@
                     limit: this.limit
                 })
                     .then(response => {
+                        console.log(response);
                         const _list = response.body.data.items
 
                         this.list = [...this.list, ..._list]
@@ -69,7 +75,7 @@
                         this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.finishLoad')
 
                         this.page++
-                    });
+                    }).catch(e => console.log(e))
             },
             newPosts() {
                 this.$router.push('/report/posts')

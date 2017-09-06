@@ -32,7 +32,7 @@
 
         <div class="vue-uploader">
             <div class="file-list">
-                <section v-for="(file, index) in files" class="file-item draggable-item">
+                <section v-for="(file, index) in files" :key="index" class="file-item draggable-item">
                     <img :src="file.src" alt="" ondragstart="return false;">
                     <span class="file-remove" @click="remove(index)">+</span>
                 </section>
