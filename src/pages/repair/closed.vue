@@ -86,6 +86,7 @@
 
     export default {
         created() {
+            document.title = '维修申报查看'
             getReportDetail(this.$route.params.id)
                 .then(res => this.postInfo = res.body.data)
                 .then(data => {

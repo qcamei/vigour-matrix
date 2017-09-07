@@ -40,6 +40,7 @@
 
     export default {
         created() {
+            document.title = '维修申报记录'
             this.loadList()
         },
         components: {},
@@ -63,7 +64,8 @@
 
                         this.list = [...this.list, ..._list]
 
-                        if (_list.length === 0) {
+                        if (this.list.length === 0) {
+                            this.$dialog.loading.close()
                             this.historyFlag = true
                             return
                         }

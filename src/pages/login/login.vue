@@ -1,10 +1,10 @@
 <template>
     <div class="out-con">
-        <yd-navbar
-            :title="this.$route.meta.title"
-            color="#fff"
-            fontsize=".36rem"
-        ></yd-navbar>
+        <!--<yd-navbar-->
+            <!--:title="this.$route.meta.title"-->
+            <!--color="#fff"-->
+            <!--fontsize=".36rem"-->
+        <!--&gt;</yd-navbar>-->
 
         <div class="logo-con">
             <img src="../../common/images/ic_small_logo@3x.png"/>
@@ -42,6 +42,7 @@
 
     export default {
         created() {
+            document.title = '登录'
             this.type = getUrlparams().type
             this.parkCode = getUrlparams().parkCode
             this.code = getUrlparams().code
@@ -125,39 +126,39 @@
                             // 手机号绑定过园区，进入选择园区登录
                             window.sessionStorage.setItem('hasBindCompany', JSON.stringify(result.data))
                             this.switchRedirectInSession()
-                            this.$router.push('/choose-park')
+                            setTimeout(() => this.$router.push('/choose-park'), 300)
                         }
                     }
                 }).catch(e => console.log(e))
             },
             switchRedirect() {
                 switch (this.type) {
-                    case '1':
+                    case 'report':
                         this.$router.replace('/report/history')
                         break;
-                    case '2':
+                    case 'metting':
                         this.$router.replace('/meeting/list')
                         break;
-                    case '3':
+                    case 'community':
                         this.$router.replace('/community/list')
                         break;
-                    case '4':
+                    case 'bill':
                         this.$router.replace('/bill/list')
                         break;
                 }
             },
             switchRedirectInSession() {
                 switch (this.type) {
-                    case '1':
+                    case 'report':
                         window.sessionStorage.setItem('redirectType', '1')
                         break;
-                    case '2':
+                    case 'metting':
                         window.sessionStorage.setItem('redirectType', '2')
                         break;
-                    case '3':
+                    case 'community':
                         window.sessionStorage.setItem('redirectType', '3')
                         break;
-                    case '4':
+                    case 'bill':
                         window.sessionStorage.setItem('redirectType', '4')
                         break;
                 }

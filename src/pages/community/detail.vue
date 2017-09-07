@@ -17,6 +17,7 @@
 
     export default {
         created() {
+            document.title = '社群活动详情'
             getCommunityDetail(this.$route.params.eventId).then(res => {
                 this.infos = res.body.data
             })

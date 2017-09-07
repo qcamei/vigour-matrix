@@ -6,12 +6,12 @@
                 <router-link :to="`/bill/detail/${item.id}`" v-for="(item, idx) in list" :key="idx">
                     <div class="history-con">
                         <div class="title-con">
-                            <div class="title">{{item.title}}</div>
-                            <div class="status" :style="{color: item.status == 'pending' ? '#e65966' : void 0}"
-                                 v-text="item.status == 'ok' ? '已支付' : '待支付'"></div>
+                            <div class="title">{{item.billMonthShow}}</div>
+                            <div class="status" style="color: #e65966"
+                                 v-text="item.confirmStatusShow"></div>
                         </div>
-                        <div class="number">合同号：{{item.number}}</div>
-                        <div class="date-time">{{item.datetime}}</div>
+                        <div class="number">合同号：{{item.billNo}}</div>
+                        <div class="date-time">{{item.pushTime}}</div>
                     </div>
                 </router-link>
             </yd-list>
@@ -32,46 +32,15 @@
 
     export default {
         created() {
+            document.title = '企业账单'
              this.loadList()
         },
         data() {
             return {
                 page: 1,
-                pageSize: 10,
-                page: 1,
                 limit: 10,
                 list: [],
                 historyFlag: false,
-                lists: [
-                    {
-                        id: 1,
-                        title: '2016年11月账单',
-                        datetime: '2016-09-10 10:00',
-                        status: 'ok',
-                        number: 'A0000000000001'
-                    },
-                    {
-                        id: 2,
-                        title: '2016年10月账单',
-                        datetime: '2016-09-10 16:00-18:00',
-                        status: 'pending',
-                        number: 'A0000000000001'
-                    },
-                    {
-                        id: 3,
-                        title: '2016年9月账单',
-                        datetime: '2016-09-10 16:00-18:00',
-                        status: 'ok',
-                        number: 'A0000000000001'
-                    },
-                    {
-                        id: 4,
-                        title: '2016年8月账单',
-                        datetime: '2016-09-10 16:00-18:00',
-                        status: 'pending',
-                        number: 'A0000000000001'
-                    },
-                ]
             }
         },
         components: {},
@@ -86,7 +55,7 @@
 
                         this.list = [...this.list, ..._list];
 
-                        if (_list.length === 0) {
+                        if (this.list.length === 0) {
                             this.historyFlag = true
                             return
                         }

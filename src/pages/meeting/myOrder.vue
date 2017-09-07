@@ -36,13 +36,15 @@
 
     export default {
         created() {
+            document.title = '我的预定'
             this.loadList()
         },
         data() {
             return {
                 page: 1,
                 limit: 10,
-                list: []
+                list: [],
+                historyFlag: false
             }
         },
         components: {},
@@ -56,6 +58,11 @@
                         const _list = res.body.data.items
 
                         this.list = [...this.list, ..._list]
+
+                        if (this.list.length === 0) {
+                            this.historyFlag = true
+                            return
+                        }
 
                         if (_list.length < this.limit) {
                             /* 所有数据加载完毕 */

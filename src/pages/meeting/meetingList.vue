@@ -51,6 +51,10 @@
                 </div>
             </yd-tab-panel>
         </yd-tab>
+
+        <router-link class="max-btn-order" to="/meeting/myorder">
+            <i class="max max-order"></i>
+        </router-link>
     </div>
 </template>
 <script>
@@ -68,7 +72,8 @@
             }
         },
         created() {
-             this.$dialog.loading.open('加载中...')
+            document.title = '会议室列表'
+            this.$dialog.loading.open('加载中...')
             getMeetingList(moment().format('YYYY-MM-DD'))
                 .then(res => {
                     res.body.data.forEach(item => this.roomList.push(item.tierName))
@@ -99,11 +104,13 @@
         },
         methods: {
             orderMeet(roomItem) {
-                this.$router.push({name: 'meetingAdd', params: {
-                    id: roomItem.id,
-                    tierName: roomItem.tierName,
-                    roomList: encodeURIComponent(this.roomList)
-                }})
+                this.$router.push({
+                    name: 'meetingAdd', params: {
+                        id: roomItem.id,
+                        tierName: roomItem.tierName,
+                        roomList: encodeURIComponent(this.roomList)
+                    }
+                })
             },
             roomDetail(roomId) {
                 this.$router.push(`/meeting/room/${roomId}`)
@@ -120,6 +127,28 @@
     }
 </script>
 <style scoped lang="stylus" rel="stylesheet/stylus">
+    .max-btn-order
+        display flex
+        align-items center
+        justify-content center
+        position fixed
+        bottom .5rem
+        right .3rem
+        width .88rem
+        height .88rem
+        border-radius 50%
+        background-color #00A7A3
+        box-shadow .08rem .14rem .1rem rgba(0, 0, 0, .1)
+        .max
+            display inline-block
+            width .48rem
+            height .48rem
+            background-repeat no-repeat
+            background-size .48rem .48rem
+
+        .max-order
+            background-image url("../../common/images/ic_mine book.png")
+
     .meeting-item
         position relative
         width 100%

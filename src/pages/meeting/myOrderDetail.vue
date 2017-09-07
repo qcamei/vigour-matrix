@@ -43,6 +43,7 @@
 
     export default {
         created() {
+            document.title = '会议室预定详情'
             orderHistoryList({
                 limit: 500
             })

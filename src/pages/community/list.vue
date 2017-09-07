@@ -37,6 +37,10 @@
 
         <div v-show="historyFlag" class="no-history"><span>暂无活动纪录</span></div>
 
+        <router-link class="max-btn-history" to="/community/history">
+            <i class="max max-history"></i>
+        </router-link>
+
     </div>
 </template>
 <script>
@@ -44,6 +48,7 @@
 
     export default {
         created() {
+            document.title = '社群活动'
             this.loadList()
         },
         data() {
@@ -67,7 +72,8 @@
 
                         this.list = [...this.list, ..._list]
 
-                        if (_list.length === 0) {
+                        if (this.list.length === 0) {
+                            this.$dialog.loading.close()
                             this.historyFlag = true
                             return
                         }
@@ -89,6 +95,26 @@
     }
 </script>
 <style scoped lang="stylus" rel="stylesheet/stylus">
+    .max-btn-history
+        display flex
+        align-items center
+        justify-content center
+        position fixed
+        bottom .5rem
+        right .3rem
+        width .88rem
+        height .88rem
+        border-radius 50%
+        background-color #00A7A3
+        box-shadow .08rem .14rem .1rem rgba(0, 0, 0, .1)
+        .max
+            display inline-block
+            width .48rem
+            height .48rem
+            background-repeat no-repeat
+            background-size .48rem .48rem
+        .max-history
+            background-image url("../../common/images/ic_history.png")
     .no-history
         width 6rem
         height 4.4rem

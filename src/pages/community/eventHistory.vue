@@ -44,6 +44,7 @@
 
     export default {
         created() {
+            document.title = '参加活动纪录'
             this.loadList()
         },
         data() {
@@ -65,7 +66,7 @@
 
                     this.list = [...this.list, ..._list];
 
-                    if (_list.length === 0) {
+                    if (this.list.length === 0) {
                         this.historyFlag = true
                         return
                     }

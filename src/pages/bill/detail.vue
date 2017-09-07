@@ -4,7 +4,7 @@
             <span slot="left">合同号</span>
             <input
                 slot="right"
-                v-model="info.number"
+                v-model="info.billNo"
                 style="color: #999; text-align: right"
                 readonly />
         </yd-cell-item>
@@ -13,7 +13,7 @@
             <span slot="left">账单期间</span>
             <input
                 slot="right"
-                v-model="info.date"
+                v-model="info.billMonth"
                 style="color: #999; text-align: right"
                 readonly />
         </yd-cell-item>
@@ -28,52 +28,38 @@
             <div class="mx-cell-subcon">
                 <div class="fee-detail">
                     <div class="title">费用明细</div>
-                    <div class="fee-row">
-                        <div class="left">费用A</div>
-                        <div class="center">10000x0.5</div>
-                        <div class="right">21,000.00</div>
-                    </div>
-                    <div class="fee-row">
-                        <div class="left">费用B</div>
-                        <div class="center">10000x0.5</div>
-                        <div class="right">21,000.00</div>
-                    </div>
-                    <div class="fee-row">
-                        <div class="left">费用C</div>
-                        <div class="center">10000x0.5</div>
-                        <div class="right">21,000.00</div>
-                    </div>
-                    <div class="fee-row">
-                        <div class="left">其他</div>
-                        <div class="right">2,800.00</div>
+                    <div class="fee-row" v-for="(item, idx) in info.bcds" :key="idx">
+                        <div class="left">{{ item.proName }}</div>
+                        <div class="center">{{ item.dosage }}</div>
+                        <div class="right">{{ item.totalMoney }}</div>
                     </div>
                 </div>
 
                 <div class="fee-detail">
                     <div class="fee-row">
                         <div class="left">合计</div>
-                        <div class="right">28,000.00</div>
+                        <div class="right">{{ info.totalAmount }}.00</div>
                     </div>
                 </div>
 
                 <div class="fee-detail">
                     <div class="fee-row">
                         <div class="left">减免费用</div>
-                        <div class="right">0.00</div>
+                        <div class="right">{{ info.reliefMoney ? info.reliefMoney : 0 }}</div>
                     </div>
                 </div>
 
                 <div class="fee-detail">
                     <div class="fee-row">
                         <div class="left">总计</div>
-                        <div class="right">28,000.00</div>
+                        <div class="right">{{ info.totalCost }}.00</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <yd-cell-item style="margin-bottom: .2rem; background-color: #fff">
-            <span slot="left">会议室设备</span>
+            <span slot="left">物业资源</span>
             <div slot="right" style="height: 1rem; line-height: 1rem">
                 <ul class="device-list">
                     <li>商用出租</li>
@@ -82,7 +68,7 @@
             </div>
         </yd-cell-item>
 
-        <div class="posts-btn-con">
+        <div class="posts-btn-con" v-show="info.confirmStatus === 'WAIT_CONFIRM'">
             <yd-button @click.native="commit" class="posts-btn" size="large" type="primary" bgcolor="#00A7A3"
                        color="#fff">支付凭证上传
             </yd-button>
@@ -90,7 +76,19 @@
     </div>
 </template>
 <script>
+    import { getBillDetail } from '../../api/api'
+
     export default {
+        created() {
+            document.title = '账单详情'
+            getBillDetail(this.$route.params.billId)
+                .then(res => {
+                    console.log(res.body)
+                    if (res.body.code == 200) {
+                        this.info = res.body.data
+                    }
+                })
+        },
         data() {
             return {
                 info: {

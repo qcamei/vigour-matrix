@@ -51,6 +51,7 @@
 
     export default {
         created() {
+            document.title = '会议室信息'
             getMeetingList(moment().format('YYYY-MM-DD'))
                 .then(res => {
                     res.body.data.forEach(item => this.roomList.push(item.tierName))

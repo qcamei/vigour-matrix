@@ -55,6 +55,7 @@
 
     export default {
         created() {
+            document.title = '活动申请详情'
             getCommunityHistoryDetail(this.$route.params.eventId)
                 .then(res => {
                     if (res.body.code == 200) {

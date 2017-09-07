@@ -11,17 +11,18 @@
             <span slot="left" style="font-size: .26rem">日期</span>
             <input
                 slot="right"
-                v-model="info.date"
+                v-model="datetime"
                 style="color: #333; text-align: right"
                 readonly/>
         </yd-cell-item>
 
         <yd-cell-item style="background-color: #fff">
-            <span slot="left">支付流水号</span>
+            <span slot="left" style="font-size: .26rem">支付流水号</span>
             <input
                 slot="right"
-                v-model="info.number"
-                style="color: #333; text-align: right; font-size: .26rem"
+                v-model="paySerialNumber"
+                style="color: #333; text-align: right; font-size: .26rem; padding: 0 0 0 .2rem"
+                ref="input0"
                 placeholder="请按照支付银行+支付流水号格式输入"
             />
         </yd-cell-item>
@@ -63,18 +64,28 @@
     </div>
 </template>
 <script>
+    import { commitPayCertificate, getBillDetail } from '../../api/api'
+
     export default {
+        created() {
+            document.title = '账单支付确认'
+            getBillDetail(this.$route.params.billId)
+                .then(res => {
+                    console.log(res.body)
+                    if (res.body.code == 200) {
+                        this.datetime = res.body.data.billMonthShow
+                    }
+                })
+        },
         data() {
             return {
-                info: {
-                    date: '2016年8月',
-                    number: ''
-                },
+                datetime: '',
+                paySerialNumber: '',
                 status: 'ready',
                 files: [],
                 point: {},
                 uploading: false,
-                percent: 0
+                percent: 0,
             }
         },
         components: {},
@@ -156,6 +167,94 @@
                     console.warn('upload progress unable to compute')
                 }
             },
+            commit() {
+                for (let i = 0; i < 1; i++) {
+                    var validFlag = this.$refs['input' + i].valid || this.files.length;
+                    if (!validFlag) {
+                        this.$dialog.toast({
+                            mes: '至少填写一项',
+                            timeout: 500
+                        });
+                        return;
+                    }
+                }
+
+                this.$dialog.loading.open('发送中')
+
+                if (this.files.length) {
+                    this.submit()
+
+                    this.$on('uploadend', function (data) {
+
+                        commitPayCertificate(this.$route.params.billId, {
+                            paySerialNumber: this.paySerialNumber,
+                            bpvs: data.map(item => {
+                                return {fileUrl: item}
+                            })
+                        })
+                            .then(res => {
+                                if (res.body.code == 200) {
+                                    this.$dialog.loading.close()
+                                    this.$dialog.toast({
+                                        mes: '提交成功',
+                                        timeout: 500,
+                                        callback: () => {
+                                            this.$router.replace('/bill/list')
+                                        }
+                                    })
+                                } else {
+                                    this.$dialog.loading.close()
+                                    this.$dialog.toast({
+                                        mes: res.body.message,
+                                        timeout: 800,
+                                        callback: () => {
+                                            this.$router.replace('/bill/list')
+                                        }
+                                    })
+                                }
+                            })
+                            .catch(e => {
+                                this.$dialog.loading.close()
+                                this.$dialog.toast({
+                                    mes: '服务器错误',
+                                    timeout: 500
+                                })
+                            })
+                    })
+                } else {
+                    commitPayCertificate(this.$route.params.billId, {
+                        paySerialNumber: this.paySerialNumber
+                    })
+                        .then(res => {
+                            if (res.body.code == 200) {
+                                this.$dialog.loading.close()
+                                this.$dialog.toast({
+                                    mes: '申报成功',
+                                    timeout: 500,
+                                    callback: () => {
+                                        this.$router.replace('/bill/list')
+                                    }
+                                })
+                            } else {
+                                this.$dialog.loading.close()
+                                this.$dialog.toast({
+                                    mes: res.body.message,
+                                    timeout: 800,
+                                    callback: () => {
+                                        this.$router.replace('/bill/list')
+                                    }
+                                })
+                            }
+                        })
+                        .catch(e => {
+                            this.$dialog.loading.close()
+                            this.$dialog.toast({
+                                mes: '服务器错误',
+                                timeout: 500
+                            })
+                        })
+                }
+            }
         }
     }
 </script>

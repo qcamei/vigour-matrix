@@ -278,7 +278,8 @@ export default new Router({
                         title: '账单支付确认',
                         backIcon: true
                     },
-                }
+                },
+
             ]
         }
     ]

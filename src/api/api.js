@@ -198,3 +198,23 @@ export const getBillList = function (obj) {
         }
     })
 }
+
+/**
+ * 企业账单详情
+ * @param id
+ */
+export const getBillDetail = function (id) {
+    return Vue.http.get(baseURL + '/wechat/billInfo/detail/' + id)
+}
+
+/**
+ * 账单支付确认
+ * @param id
+ * @param obj
+ * @returns {*}
+ */
+export const commitPayCertificate = function (id, obj) {
+    return Vue.http.put(baseURL + '/wechat/billInfo/confirm/' + id, {
+        ...obj
+    })
+}

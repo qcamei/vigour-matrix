@@ -76,6 +76,7 @@
 
     export default {
         created() {
+            document.title = '添加会议室预定'
             this.roomList = decodeURIComponent(this.$route.params.roomList).split(',').map(item => {
                 return {label: item, method: select => this.info.resourceName = select.label}
             })

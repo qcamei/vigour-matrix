@@ -1,15 +1,19 @@
 <template>
     <div>
-        <yd-navbar
-            :title="this.$route.meta.title"
-            color="#fff"
-            fontsize=".36rem"
-        ></yd-navbar>
+        <!--<yd-navbar-->
+            <!--:title="this.$route.meta.title"-->
+            <!--color="#fff"-->
+            <!--fontsize=".36rem"-->
+        <!--&gt;</yd-navbar>-->
 
         <yd-cell-group v-for="(item, idx) in newCompanyArr" :key="idx">
             <yd-cell-item>
                 <span slot="left">所属园区</span>
                 <span slot="right">{{ item.parkName }}</span>
+            </yd-cell-item>
+            <yd-cell-item>
+                <span slot="left">企业名称</span>
+                <span slot="right">{{ item.enterpriseName }}</span>
             </yd-cell-item>
             <yd-cell-item>
                 <span slot="left">用户名</span>
@@ -27,6 +31,7 @@
 
     export default {
         created() {
+            document.title = '绑定用户'
             this.hasBindCompany = JSON.parse(sessionStorage.getItem('hasBindCompany'))
             this.type = sessionStorage.getItem('redirectType')
         },

@@ -102,6 +102,9 @@
     import {newPostReport} from '../../api/api'
 
     export default {
+        created() {
+            document.title = '新建维修申报'
+        },
         data() {
             return {
                 postInfo: {

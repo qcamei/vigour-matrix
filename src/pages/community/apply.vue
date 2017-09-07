@@ -74,6 +74,7 @@
 
     export default {
         created() {
+            document.title = '参加活动申请'
             getCommunityDetail(this.$route.params.eventId).then(res => {
                 this.infos.communityId = res.body.data.id
                 this.title = res.body.data.title
