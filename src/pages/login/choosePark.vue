@@ -28,7 +28,7 @@
     export default {
         created() {
             this.hasBindCompany = JSON.parse(sessionStorage.getItem('hasBindCompany'))
-            this.type = getUrlparams().type
+            this.type = sessionStorage.getItem('redirectType')
         },
         watch: {
             hasBindCompany(newArr, oldArr) {

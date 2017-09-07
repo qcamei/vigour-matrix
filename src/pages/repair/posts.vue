@@ -99,7 +99,7 @@
     </div>
 </template>
 <script>
-    import { newPostReport } from '../../api/api'
+    import {newPostReport} from '../../api/api'
 
     export default {
         data() {
@@ -237,6 +237,13 @@
                                     })
                                 }
                             })
+                            .catch(e => {
+                                this.$dialog.loading.close()
+                                this.$dialog.toast({
+                                    mes: '服务器错误',
+                                    timeout: 500
+                                })
+                            })
                     })
                 } else {
                     newPostReport({
@@ -254,6 +261,13 @@
                                     }
                                 })
                             }
+                        })
+                        .catch(e => {
+                            this.$dialog.loading.close()
+                            this.$dialog.toast({
+                                mes: '服务器错误',
+                                timeout: 500
+                            })
                         })
                 }
             }

@@ -35,6 +35,7 @@
 
         </yd-infinitescroll>
 
+        <div v-show="historyFlag" class="no-history"><span>暂无活动纪录</span></div>
 
     </div>
 </template>
@@ -49,7 +50,8 @@
             return {
                 page: 1,
                 limit: 5,
-                list: []
+                list: [],
+                historyFlag: false
             }
         },
         components: {},
@@ -61,10 +63,14 @@
                     limit: this.limit
                 })
                     .then(response => {
-                        console.log(this.list);
                         const _list = response.body.data.items
 
                         this.list = [...this.list, ..._list]
+
+                        if (_list.length === 0) {
+                            this.historyFlag = true
+                            return
+                        }
 
                         if (_list.length < this.limit) {
                             /* 所有数据加载完毕 */
@@ -83,6 +89,24 @@
     }
 </script>
 <style scoped lang="stylus" rel="stylesheet/stylus">
+    .no-history
+        width 6rem
+        height 4.4rem
+        background-image url('../../common/images/ic_no history@3x.png')
+        background-size 6rem 4.4rem
+        background-repeat no-repeat
+        position absolute
+        left 50%
+        top 45%
+        margin-top -2.2rem
+        margin-left -3rem
+        span
+            font-size .3rem
+            color #333
+            position absolute
+            bottom -.6rem
+            left 50%
+            transform translateX(-50%)
     .activity-item
         display block
         width 100%

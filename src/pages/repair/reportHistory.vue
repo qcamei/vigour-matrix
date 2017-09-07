@@ -26,6 +26,8 @@
 
         </yd-infinitescroll>
 
+        <div v-show="historyFlag" class="no-history"><span>暂无历史纪录</span></div>
+
         <div class="posts-btn-con">
             <yd-button @click.native="newPosts" class="posts-btn" size="large" type="primary" bgcolor="#00A7A3"
                        color="#fff">新建维修申报
@@ -45,7 +47,8 @@
             return {
                 page: 1,
                 limit: 10,
-                list: []
+                list: [],
+                historyFlag: false
             }
         },
         methods: {
@@ -56,10 +59,14 @@
                     limit: this.limit
                 })
                     .then(response => {
-                        console.log(response);
                         const _list = response.body.data.items
 
                         this.list = [...this.list, ..._list]
+
+                        if (_list.length === 0) {
+                            this.historyFlag = true
+                            return
+                        }
 
                         if (_list.length < this.limit) {
                             /* 所有数据加载完毕 */
@@ -101,6 +108,24 @@
 </script>
 <style lang="stylus" rel="stylesheet/stylus">
     #report-history
+        .no-history
+            width 6rem
+            height 4.4rem
+            background-image url('../../common/images/ic_no history@3x.png')
+            background-size 6rem 4.4rem
+            background-repeat no-repeat
+            position absolute
+            left 50%
+            top 45%
+            margin-top -2.2rem
+            margin-left -3rem
+            span
+                font-size .3rem
+                color #333
+                position absolute
+                bottom -.6rem
+                left 50%
+                transform translateX(-50%)
         .list-loading
             height 1.86rem
         .list-donetip

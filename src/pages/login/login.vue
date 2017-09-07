@@ -124,6 +124,7 @@
                         } else if (result.data && result.data.length > 0) {
                             // 手机号绑定过园区，进入选择园区登录
                             window.sessionStorage.setItem('hasBindCompany', JSON.stringify(result.data))
+                            this.switchRedirectInSession()
                             this.$router.push('/choose-park')
                         }
                     }
@@ -142,6 +143,22 @@
                         break;
                     case '4':
                         this.$router.replace('/bill/list')
+                        break;
+                }
+            },
+            switchRedirectInSession() {
+                switch (this.type) {
+                    case '1':
+                        window.sessionStorage.setItem('redirectType', '1')
+                        break;
+                    case '2':
+                        window.sessionStorage.setItem('redirectType', '2')
+                        break;
+                    case '3':
+                        window.sessionStorage.setItem('redirectType', '3')
+                        break;
+                    case '4':
+                        window.sessionStorage.setItem('redirectType', '4')
                         break;
                 }
             }
