@@ -23,6 +23,13 @@ const ChoosePark = resolve => {
         Loading.close()
     }, 'login-group')
 }
+const SelectPark = resolve => {
+    Loading.open('加载中...')
+    require.ensure(['../pages/login/selectPark.vue'], () => {
+        resolve(require('../pages/login/selectPark.vue'))
+        Loading.close()
+    }, 'login-group')
+}
 
 // 维修申报
 const ReportHistory = resolve => {
@@ -73,6 +80,7 @@ const BillList = resolve => {
 }
 const BillListDetail = resolve => require.ensure(['../pages/bill/detail.vue'], () => resolve(require('../pages/bill/detail.vue')), 'bill-group')
 const BillListDetailConfirm = resolve => require.ensure(['../pages/bill/confirm.vue'], () => resolve(require('../pages/bill/confirm.vue')), 'bill-group')
+const BillListUnbound = resolve => require.ensure(['../pages/bill/unbound.vue'], () => resolve(require('../pages/bill/unbound.vue')), 'bill-group')
 
 Vue.use(Router)
 export default new Router({
@@ -93,6 +101,13 @@ export default new Router({
         {
             path: '/choose-park',
             component: ChoosePark,
+            meta: {
+                title: '绑定用户'
+            }
+        },
+        {
+            path: '/select-park',
+            component: SelectPark,
             meta: {
                 title: '绑定用户'
             }
@@ -279,7 +294,14 @@ export default new Router({
                         backIcon: true
                     },
                 },
-
+                {
+                    path: 'unbound',
+                    component: BillListUnbound,
+                    meta: {
+                        title: '企业账单',
+                        backIcon: false
+                    },
+                },
             ]
         }
     ]

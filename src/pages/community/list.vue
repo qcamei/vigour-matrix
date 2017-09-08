@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div id="community">
 
         <yd-infinitescroll :on-infinite="loadList" :distance="50" ref="infinitescrollDemo">
 
@@ -28,7 +28,7 @@
             </yd-list>
 
             <!-- 数据全部加载完毕显示 -->
-            <span slot="doneTip">没有数据啦~~</span>
+            <span slot="doneTip">--------- 没有更多数据 ---------</span>
 
             <!-- 加载中提示，不指定，将显示默认加载中图标 -->
             <img slot="loadingTip" src="http://static.ydcss.com/uploads/ydui/loading/loading7.svg"/>
@@ -100,11 +100,11 @@
         align-items center
         justify-content center
         position fixed
-        bottom .5rem
-        right .3rem
+        bottom .3rem
+        right .2rem
         width .88rem
         height .88rem
-        border-radius 50%
+        border-radius 5%
         background-color #00A7A3
         box-shadow .08rem .14rem .1rem rgba(0, 0, 0, .1)
         .max

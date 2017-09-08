@@ -3,24 +3,26 @@
         <yd-cell-group id="input-group" style="margin-bottom: .24rem">
             <yd-cell-item>
                 <span slot="left" class="label-text">可容纳人数</span>
-                <span slot="right" class="value-text">{{ info.cotainNum }}人</span>
+                <span slot="right" class="value-text">{{ info.containNum }}人</span>
             </yd-cell-item>
             <yd-cell-item style="height: 2.4rem">
                 <span slot="left" class="label-text">照片</span>
-                <div slot="right" class="image-con">
-                    <ul class="upload-list">
-                        <li v-for="(image, idx) in imageList" :key="idx"><img :src="image"/></li>
-                    </ul>
-                </div>
+                <!--<div slot="right" class="image-con">-->
+                    <!--<ul class="upload-list">-->
+                        <!--<li v-for="(image, idx) in imageList" :key="idx"><img class="room-image" :src="image"/></li>-->
+                    <!--</ul>-->
+                <!--</div>-->
+                <yd-lightbox slot="right" :num="imageList.length" class="upload-list">
+                    <div class="room-item" v-for="(image, idx) in imageList" :key="idx">
+                        <yd-lightbox-img class="room-image"  :src="image" ></yd-lightbox-img>
+                    </div>
+                </yd-lightbox>
             </yd-cell-item>
             <yd-cell-item>
                 <span slot="left" class="label-text">会议室设备</span>
-                <div slot="right" class="value-text" style="height: 1rem; line-height: 1rem">
+                <div slot="right" class="value-text" style="line-height: 1.5; padding: .2rem">
                     <ul class="device-list">
-                        <li>投影设备</li>
-                        <li>液晶电视</li>
-                        <li>移动白板</li>
-                        <li>电话机</li>
+                        <li v-for="(item, idx) in deviceList" :key="idx">{{ item }}</li>
                     </ul>
                 </div>
             </yd-cell-item>
@@ -47,33 +49,48 @@
 </template>
 <script>
     import moment from 'moment'
-    import {getMeetingList} from '../../api/api'
+    import { getMeetingList } from '../../api/api'
+    import { LightBox, LightBoxImg, LightBoxTxt } from 'vue-ydui/dist/lib.rem/lightbox';
 
     export default {
         created() {
             document.title = '会议室信息'
+
             getMeetingList(moment().format('YYYY-MM-DD'))
                 .then(res => {
-                    res.body.data.forEach(item => this.roomList.push(item.tierName))
+                    res.body.data.forEach(item => this.roomList.push(item.name))
                     return res
                 })
                 .then(res => this.info = res.body.data.find(item => item.id == this.$route.params.id))
                 .then(data => this.imageList = JSON.parse(data.images))
         },
+        watch: {
+            info: {
+                handler(newVal, oldVal) {
+                    this.deviceList = newVal['equipmentNames'] ? newVal['equipmentNames'].split(', ') : []
+                },
+                deep: true
+            }
+        },
         data() {
             return {
                 info: {},
                 imageList: [],
-                roomList: []
+                roomList: [],
+                deviceList: []
             }
         },
-        components: {},
+        components: {
+            [LightBox.name]: LightBox,
+            [LightBoxImg.name]: LightBoxImg,
+            [LightBoxTxt.name]: LightBoxTxt
+        },
         methods: {
             addOrder() {
                 this.$router.push({
                     name: 'meetingAdd', params: {
                         id: this.info.id,
-                        tierName: this.info.tierName,
+                        tierName: this.info.name,
                         roomList: encodeURIComponent(this.roomList)
                     }
                 })
@@ -94,19 +111,20 @@
             .upload-list
                 display flex
                 justify-content flex-start
-                li
+                .room-item
                     display flex
                     justify-content center
                     position relative
-                    width 33vw
                     border-radius 2px
                     overflow hidden
-                    img
-                        width 1.6rem
-                        height 1.6rem
-                        border none
-                        border-radius 2px
-                        object-fit cover
+                    width 33vw
+                .room-image
+                    width 1.6rem
+                    height 1.6rem
+                    border none
+                    border-radius 2px
+                    object-fit cover
+                    background-color #f3f4f5
         .device-list
             overflow hidden
             li

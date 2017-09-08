@@ -218,3 +218,11 @@ export const commitPayCertificate = function (id, obj) {
         ...obj
     })
 }
+
+/**
+ * 获取当前用户手机号对应的企业账号
+ * @returns {*}
+ */
+export const getUsersCompany = function () {
+    return Vue.http.get(baseURL + '/wechat/valid/user')
+}

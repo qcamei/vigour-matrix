@@ -36,7 +36,7 @@
                     :startYear="new Date().getFullYear()"
                     :startDate="startDate"
                     :startHour="9"
-                    :endHour="21"
+                    :endHour="20"
                 ></yd-datetime>
             </yd-cell-item>
             <yd-cell-item arrow>
@@ -48,7 +48,7 @@
                     :startDate="info.startDateStr"
                     :startYear="new Date().getFullYear()"
                     :startHour="9"
-                    :endHour="21"
+                    :endHour="20"
                 ></yd-datetime>
             </yd-cell-item>
         </yd-cell-group>

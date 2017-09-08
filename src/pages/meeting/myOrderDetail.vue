@@ -15,11 +15,11 @@
             </yd-cell-item>
             <yd-cell-item arrow>
                 <span slot="left">开始时间</span>
-                <span slot="right" style="color: #24242c">{{moment(info.reserveDate).format('YYYY-MM-DD')}} {{moment(info.startDate).format('HH:mm')}}</span>
+                <span slot="right" style="color: #24242c">{{moment(info.reserveDate).format('YYYY-MM-DD')}} {{info.startDateStr}}</span>
             </yd-cell-item>
             <yd-cell-item arrow>
                 <span slot="left">结束时间</span>
-                <span slot="right" style="color: #24242c">{{moment(info.reserveDate).format('YYYY-MM-DD')}} {{moment(info.endDate).format('HH:mm')}}</span>
+                <span slot="right" style="color: #24242c">{{moment(info.reserveDate).format('YYYY-MM-DD')}} {{info.endDateStr}}</span>
             </yd-cell-item>
         </yd-cell-group>
 
@@ -45,7 +45,7 @@
         created() {
             document.title = '会议室预定详情'
             orderHistoryList({
-                limit: 500
+                limit: 1000
             })
                 .then(res => res.body.data.items.find(item => item.id == this.$route.params.orderId))
                 .then(data => this.info = data)
@@ -79,7 +79,13 @@
                             })
                         }
                     })
-                    .catch(e => console.log(e))
+                    .catch(e => {
+                        this.$dialog.loading.close()
+                        this.$dialog.toast({
+                            mes: '网络错误',
+                            timeout: 800
+                        })
+                    })
             }
         }
     }

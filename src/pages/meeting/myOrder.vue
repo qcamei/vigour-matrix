@@ -7,11 +7,11 @@
                     <div class="history-con">
                         <div class="title">{{item.resourceName}}</div>
                         <div class="info-con">
-                            <div class="date-time">{{ moment(item.reserveDate).format('MM-DD') }} {{ moment(item.startDate).format('HH:mm') }}-{{ moment(item.endDate).format('HH:mm') }}</div>
+                            <div class="date-time">{{ moment(item.reserveDate).format('MM-DD') }} {{ item.startDateStr }}-{{ item.endDateStr }}</div>
                             <div class="status">
                                 <span>预定状态：</span>
-                                <span :style="{color: item.status != 'NORMAL' ? '#e65966' : void 0}"
-                                      v-text="item.status == 'NORMAL' ? '已预订' : '已取消'"></span>
+                                <span :style="{color: item.enableStatus != 'ENABLE' ? '#e65966' : void 0}"
+                                      v-text="item.enableStatus == 'ENABLE' ? '已预订' : '已取消'"></span>
                             </div>
                         </div>
                     </div>
@@ -19,7 +19,7 @@
             </yd-list>
 
             <!-- 数据全部加载完毕显示 -->
-            <span slot="doneTip">没有数据啦~~</span>
+            <span slot="doneTip">--------- 没有更多数据 ---------</span>
 
             <!-- 加载中提示，不指定，将显示默认加载中图标 -->
             <img slot="loadingTip" src="http://static.ydcss.com/uploads/ydui/loading/loading7.svg"/>

@@ -30,7 +30,7 @@
                     <div class="title">费用明细</div>
                     <div class="fee-row" v-for="(item, idx) in info.bcds" :key="idx">
                         <div class="left">{{ item.proName }}</div>
-                        <div class="center">{{ item.dosage }}</div>
+                        <div class="center">{{ item.percentDec }}</div>
                         <div class="right">{{ item.totalMoney }}</div>
                     </div>
                 </div>
@@ -38,7 +38,7 @@
                 <div class="fee-detail">
                     <div class="fee-row">
                         <div class="left">合计</div>
-                        <div class="right">{{ info.totalAmount }}.00</div>
+                        <div class="right">{{ info.totalAmount }}</div>
                     </div>
                 </div>
 
@@ -52,7 +52,7 @@
                 <div class="fee-detail">
                     <div class="fee-row">
                         <div class="left">总计</div>
-                        <div class="right">{{ info.totalCost }}.00</div>
+                        <div class="right">{{ info.totalCost }}</div>
                     </div>
                 </div>
             </div>
@@ -91,10 +91,7 @@
         },
         data() {
             return {
-                info: {
-                    number: 'A0000000000001',
-                    date: '2016年8月'
-                }
+                info: {}
             }
         },
         components: {},

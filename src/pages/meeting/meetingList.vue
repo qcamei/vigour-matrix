@@ -3,7 +3,7 @@
         <yd-tab v-if="totalInfo && totalInfo.length === 5">
             <yd-tab-panel v-for="(day, idx) in totalInfo" :key="idx" :label="day.date">
                 <div class="meeting-item" v-for="(roomItem, index) in day.room" @click="roomDetail(roomItem.id)">
-                    <div class="title">{{ roomItem.tierName }}</div>
+                    <div class="title">{{ roomItem.name }}</div>
                     <div class="desc">{{ roomItem.description }}</div>
                     <div class="meetbar-con">
                         <div class="even-bar">
@@ -76,7 +76,7 @@
             this.$dialog.loading.open('加载中...')
             getMeetingList(moment().format('YYYY-MM-DD'))
                 .then(res => {
-                    res.body.data.forEach(item => this.roomList.push(item.tierName))
+                    res.body.data.forEach(item => this.roomList.push(item.name))
                     return this.infos.push({
                         date: moment().format('MM月DD日'),
                         room: res.body.data,
@@ -107,7 +107,7 @@
                 this.$router.push({
                     name: 'meetingAdd', params: {
                         id: roomItem.id,
-                        tierName: roomItem.tierName,
+                        tierName: roomItem.name,
                         roomList: encodeURIComponent(this.roomList)
                     }
                 })

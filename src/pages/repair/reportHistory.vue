@@ -19,7 +19,7 @@
             </yd-list>
 
             <!-- 数据全部加载完毕显示 -->
-            <span slot="doneTip">没有数据啦~~</span>
+            <span slot="doneTip">--------- 没有更多数据 ---------</span>
 
             <!-- 加载中提示，不指定，将显示默认加载中图标 -->
             <img slot="loadingTip" src="http://static.ydcss.com/uploads/ydui/loading/loading7.svg"/>
