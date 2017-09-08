@@ -58,15 +58,15 @@
             </div>
         </div>
 
-        <yd-cell-item style="margin-bottom: .2rem; background-color: #fff">
-            <span slot="left">物业资源</span>
-            <div slot="right" style="height: 1rem; line-height: 1rem">
-                <ul class="device-list">
-                    <li>商用出租</li>
-                    <li>广告出租</li>
-                </ul>
-            </div>
-        </yd-cell-item>
+        <!--<yd-cell-item style="margin-bottom: .2rem; background-color: #fff">-->
+            <!--<span slot="left">物业资源</span>-->
+            <!--<div slot="right" style="height: 1rem; line-height: 1rem">-->
+                <!--<ul class="device-list">-->
+                    <!--<li>商用出租</li>-->
+                    <!--<li>广告出租</li>-->
+                <!--</ul>-->
+            <!--</div>-->
+        <!--</yd-cell-item>-->
 
         <div class="posts-btn-con" v-show="info.confirmStatus === 'WAIT_CONFIRM'">
             <yd-button @click.native="commit" class="posts-btn" size="large" type="primary" bgcolor="#00A7A3"

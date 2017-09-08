@@ -168,15 +168,13 @@
                 }
             },
             commit() {
-                for (let i = 0; i < 1; i++) {
-                    var validFlag = this.$refs['input' + i].valid || this.files.length;
-                    if (!validFlag) {
-                        this.$dialog.toast({
-                            mes: '至少填写一项',
-                            timeout: 500
-                        });
-                        return;
-                    }
+                var validFlag = this.$refs.input0.value.length || this.files.length;
+                if (!validFlag) {
+                    this.$dialog.toast({
+                        mes: '至少填写一项',
+                        timeout: 500
+                    });
+                    return;
                 }
 
                 this.$dialog.loading.open('发送中')
