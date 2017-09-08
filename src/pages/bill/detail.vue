@@ -4,7 +4,7 @@
             <span slot="left">合同号</span>
             <input
                 slot="right"
-                v-model="info.billNo"
+                v-model="info.contractNo"
                 style="color: #999; text-align: right"
                 readonly />
         </yd-cell-item>
@@ -30,7 +30,7 @@
                     <div class="title">费用明细</div>
                     <div class="fee-row" v-for="(item, idx) in info.bcds" :key="idx">
                         <div class="left">{{ item.proName }}</div>
-                        <div class="center">{{ item.percentDec }}</div>
+                        <div class="center">{{ item.dosage ? item.dosage : '' }}</div>
                         <div class="right">{{ item.totalMoney }}</div>
                     </div>
                 </div>

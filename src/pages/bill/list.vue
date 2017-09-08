@@ -10,7 +10,7 @@
                             <div class="status" style="color: #e65966"
                                  v-text="item.confirmStatusShow"></div>
                         </div>
-                        <div class="number">合同号：{{item.billNo}}</div>
+                        <div class="number">合同号：{{item.contractNo}}</div>
                         <div class="date-time">{{item.pushTime}}</div>
                     </div>
                 </router-link>
