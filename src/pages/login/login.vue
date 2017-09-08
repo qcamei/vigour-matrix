@@ -143,7 +143,7 @@
                         this.$router.replace('/community/list')
                         break;
                     case 'bill':
-                        this.$router.replace('/bill/list')
+                        this.$router.replace('/bill/unbound')
                         break;
                 }
             },
