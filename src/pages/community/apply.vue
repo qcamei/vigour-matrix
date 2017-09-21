@@ -11,6 +11,7 @@
                     v-model="infos.proprser"
                     required
                     placeholder="请输入联系人姓名"
+                    :max="10"
                 ></yd-input>
             </yd-cell-item>
             <yd-cell-item>
@@ -29,16 +30,20 @@
                 <span slot="left">公司名称</span>
                 <yd-input
                     slot="right"
+                    ref="input2"
                     v-model="infos.companyName"
                     placeholder="请输入公司名称"
+                    :max="10"
                 ></yd-input>
             </yd-cell-item>
             <yd-cell-item>
                 <span slot="left">职务</span>
                 <yd-input
                     slot="right"
+                    ref="input3"
                     v-model="infos.position"
                     placeholder="请输入职务"
+                    :max="10"
                 ></yd-input>
             </yd-cell-item>
             <yd-cell-item>
@@ -47,7 +52,7 @@
                     slot="right"
                     type="number"
                     v-model="infos.num"
-                    ref="input2"
+                    ref="input4"
                     regex="^\+?[1-9]\d*$"
                     placeholder="请输入人数"
                 ></yd-input>
@@ -100,7 +105,7 @@
                 this.$router.go(-1)
             },
             commit() {
-                for (let i = 0; i < 3; i++) {
+                for (let i = 0; i < 5; i++) {
                     var validFlag = this.$refs['input' + i].valid
                     if (!validFlag) {
                         this.$dialog.toast({

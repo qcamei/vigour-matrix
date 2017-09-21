@@ -9,6 +9,7 @@
                     v-model="info.name"
                     required
                     placeholder="请输入预定人姓名"
+                    :max="10"
                 ></yd-input>
             </yd-cell-item>
             <yd-cell-item>

@@ -45,12 +45,13 @@
         <!-- 图片上传 -->
         <div v-if="postInfo && postInfo.taskImageUri && postInfo.taskImageUri.length">
             <div class="photo-tit">
-                <span class="text1">添加现场图片</span>
-                <span class="text2">（最多支持上传三张图片）</span>
+                <span class="text1">现场图片</span>
             </div>
-            <ul class="upload-list">
-                <li v-for="(image, idx) in postInfo.taskImageUri" :key="idx"><img :src="image.path"/></li>
-            </ul>
+            <yd-lightbox slot="right" :num="postInfo.taskImageUri.length" class="upload-list">
+                <div class="room-item" v-for="(image, idx) in postInfo.taskImageUri" :key="idx">
+                    <yd-lightbox-img class="room-image"  :src="image.path" ></yd-lightbox-img>
+                </div>
+            </yd-lightbox>
         </div>
 
         <div class="smile-con">
@@ -83,6 +84,7 @@
 </template>
 <script>
     import { getReportDetail } from '../../api/api'
+    import { LightBox, LightBoxImg, LightBoxTxt } from 'vue-ydui/dist/lib.rem/lightbox'
 
     export default {
         created() {
@@ -118,7 +120,11 @@
                 postInfo: {},
             }
         },
-        components: {},
+        components: {
+            [LightBox.name]: LightBox,
+            [LightBoxImg.name]: LightBoxImg,
+            [LightBoxTxt.name]: LightBoxTxt
+        },
         methods: {}
     }
 </script>
@@ -145,19 +151,20 @@
             display flex
             justify-content flex-start
             margin-top .35rem
-            li
+            .room-item
                 display flex
                 justify-content center
                 position relative
                 width 33vw
                 border-radius 2px
                 overflow hidden
-                img
-                    width 1.6rem
-                    height 1.6rem
-                    border none
-                    border-radius 2px
-                    object-fit cover
+            .room-image
+                width 1.6rem
+                height 1.6rem
+                border none
+                border-radius 2px
+                object-fit cover
+                background-color #f3f4f5
         .posts-btn-con
             position fixed
             bottom 0

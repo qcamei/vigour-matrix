@@ -83,7 +83,7 @@
                 paySerialNumber: '',
                 status: 'ready',
                 files: [],
-                point: {},
+                deelFiles: [],
                 uploading: false,
                 percent: 0,
             }
@@ -93,6 +93,43 @@
             add() {
                 this.$refs.file.click()
             },
+            deelImage(path, callback) {
+                var img = new Image();
+                img.src = path;
+                img.onload = function () {
+                    //默认按比例压缩
+                    var w = this.width,
+                        h = this.height;
+                    var quality = 0.1; // 默认图片质量为0.5
+
+                    //生成canvas
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
+
+                    // 创建属性节点
+                    canvas.setAttribute("width", w);
+                    canvas.setAttribute("height", h);
+
+                    ctx.drawImage(this, 0, 0, w, h);
+                    // quality值越小，所绘制出的图像越模糊
+                    var base64 = canvas.toDataURL('image/jpeg', quality);
+                    // 回调函数返回base64的值
+                    callback(base64);
+                };
+            },
+            dataURItoBlob(base64Data) {
+                var byteString;
+                if (base64Data.split(',')[0].indexOf('base64') >= 0)
+                    byteString = atob(base64Data.split(',')[1]);
+                else
+                    byteString = unescape(base64Data.split(',')[1]);
+                var mimeString = base64Data.split(',')[0].split(':')[1].split(';')[0];
+                var ia = new Uint8Array(byteString.length);
+                for (var i = 0; i < byteString.length; i++) {
+                    ia[i] = byteString.charCodeAt(i);
+                }
+                return new Blob([ia], {type: mimeString});
+            },
             submit() {
                 var _this = this
                 if (this.files.length === 0) {
@@ -100,8 +137,8 @@
                     return
                 }
                 const formData = new FormData()
-                this.files.forEach((item) => {
-                    formData.append(item.name, item.file)
+                this.deelFiles.forEach((item) => {
+                    formData.append(Math.random() + '', item)
                 })
                 const xhr = new XMLHttpRequest()
                 xhr.upload.addEventListener('progress', this.uploadProgress, false)
@@ -126,6 +163,7 @@
             },
             remove(index) {
                 this.files.splice(index, 1)
+                this.deelFiles.splice(index, 1)
             },
             fileChanged() {
                 const list = this.$refs.file.files
@@ -146,7 +184,10 @@
             html5Reader(file, item) {
                 const reader = new FileReader()
                 reader.onload = (e) => {
-                    this.$set(item, 'src', e.target.result)
+                    this.deelImage(e.target.result, zippedSrc => {
+                        this.$set(item, 'src', zippedSrc);
+                        this.deelFiles.push(this.dataURItoBlob(zippedSrc))
+                    })
                 }
                 reader.readAsDataURL(file)
             },
