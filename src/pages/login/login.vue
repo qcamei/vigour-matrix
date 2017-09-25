@@ -30,7 +30,7 @@
 
                 </yd-cell-item>
                 <yd-button class="logo-btn" size="large" type="primary" bgcolor="#00A7A3" color="#fff"
-                           @click.native="login">登录
+                           @click.native="login">确认绑定
                 </yd-button>
             </yd-cell-group>
         </div>
@@ -42,7 +42,7 @@
 
     export default {
         created() {
-            document.title = '登录'
+            document.title = '绑定手机号'
             this.type = getUrlparams().type
             this.parkCode = getUrlparams().parkCode
             this.code = getUrlparams().code
