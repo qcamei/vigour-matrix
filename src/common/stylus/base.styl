@@ -7,7 +7,8 @@ body, html
     -webkit-tap-highlight-color: transparent
     background: $color-background
     color: $color-text
-
+::-webkit-scrollbar
+    display none
 /*覆盖YDUI的样式*/
 .m-navbar
     background-color #24242C !important
@@ -23,6 +24,8 @@ body, html
 button, input, select, textarea
     font-family: 'PingFang SC', 'Microsoft YaHei UI', 'STHeitiSC-Light', 'Helvetica-Light', arial, sans-serif, 'Droid Sans Fallback' !important
 
+.text-red
+    color #e65966
 .cell-title
     font-size .26rem !important
     color #24242c !important
@@ -77,3 +80,23 @@ button, input, select, textarea
     color #999
 #community .list-theme1
     padding 0 !important
+.yd-tabbar:after
+    border-top 1px solid #e7e7e7 !important
+#mine
+    .yd-cell-item
+        padding-left .4rem !important
+    .yd-cell-icon
+        margin-right .28rem !important
+    .yd-cell:after
+        border-bottom none
+    .yd-cell-item:not(:last-child):after
+        border-bottom 1px solid #e7e7e7 !important
+#myOrderDetail
+    .yd-cell-item
+        padding-left .2rem !important
+    .yd-cell:after
+        border-color transparent
+#invoiceInfo
+    input
+        font-size .26rem !important
+        text-align right

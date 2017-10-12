@@ -7,6 +7,7 @@ import Report from '../pages/repair/report.vue'
 import Community from '../pages/community/community.vue'
 import Meeting from '../pages/meeting/meeting.vue'
 import Bill from '../pages/bill/bill.vue'
+import Shop from '../pages/shop/shop.vue'
 
 // 登录
 const Login = resolve => {
@@ -81,6 +82,30 @@ const BillList = resolve => {
 const BillListDetail = resolve => require.ensure(['../pages/bill/detail.vue'], () => resolve(require('../pages/bill/detail.vue')), 'bill-group')
 const BillListDetailConfirm = resolve => require.ensure(['../pages/bill/confirm.vue'], () => resolve(require('../pages/bill/confirm.vue')), 'bill-group')
 const BillListUnbound = resolve => require.ensure(['../pages/bill/unbound.vue'], () => resolve(require('../pages/bill/unbound.vue')), 'bill-group')
+
+// 服务商城
+const ShopHome = resolve => {
+    Loading.open('加载中...')
+    require.ensure(['../pages/shop/home.vue'], () => {
+        resolve(require('../pages/shop/home.vue'))
+        Loading.close()
+    }, 'shop-group')
+}
+const ServiceType = resolve => require.ensure(['../pages/shop/type.vue'], () => resolve(require('../pages/shop/type.vue')), 'shop-group')
+const Mine = resolve => require.ensure(['../pages/shop/mine.vue'], () => resolve(require('../pages/shop/mine.vue')), 'shop-group')
+const ShopOrder = resolve => require.ensure(['../pages/shop/order/index.vue'], () => resolve(require('../pages/shop/order/index.vue')), 'shop-group')
+const MyOrder = resolve => require.ensure(['../pages/shop/order/myorder.vue'], () => resolve(require('../pages/shop/order/myorder.vue')), 'shop-group')
+const MyApply = resolve => require.ensure(['../pages/shop/order/myapply.vue'], () => resolve(require('../pages/shop/order/myapply.vue')), 'shop-group')
+const MyorderDetail = resolve => require.ensure(['../pages/shop/order/orderDetail.vue'], () => resolve(require('../pages/shop/order/orderDetail.vue')), 'shop-group')
+const MyapplyDetail = resolve => require.ensure(['../pages/shop/order/applyDetail.vue'], () => resolve(require('../pages/shop/order/applyDetail.vue')), 'shop-group')
+const MyFavorite = resolve => require.ensure(['../pages/shop/favorite/myFavorite.vue'], () => resolve(require('../pages/shop/favorite/myFavorite.vue')), 'shop-group')
+const ServiceList = resolve => require.ensure(['../pages/shop/favorite/serviceList.vue'], () => resolve(require('../pages/shop/favorite/serviceList.vue')), 'shop-group')
+const ServiceDetail = resolve => require.ensure(['../pages/shop/favorite/serviceDetail.vue'], () => resolve(require('../pages/shop/favorite/serviceDetail.vue')), 'shop-group')
+const MyInvoice = resolve => require.ensure(['../pages/shop/invoice/invoiceInfo.vue'], () => resolve(require('../pages/shop/invoice/invoiceInfo.vue')), 'shop-group')
+const MyAddress = resolve => require.ensure(['../pages/shop/address/myAddress.vue'], () => resolve(require('../pages/shop/address/myAddress.vue')), 'shop-group')
+const AddInvoice = resolve => require.ensure(['../pages/shop/invoice/addInvoice.vue'], () => resolve(require('../pages/shop/invoice/addInvoice.vue')), 'shop-group')
+const EditInvoice = resolve => require.ensure(['../pages/shop/invoice/editInvoice.vue'], () => resolve(require('../pages/shop/invoice/editInvoice.vue')), 'shop-group')
+const AddAddress = resolve => require.ensure(['../pages/shop/address/addAddress.vue'], () => resolve(require('../pages/shop/address/addAddress.vue')), 'shop-group')
 
 Vue.use(Router)
 export default new Router({
@@ -301,6 +326,123 @@ export default new Router({
                         title: '企业账单',
                         backIcon: false
                     },
+                },
+            ]
+        },
+        {
+            path: '/shop',
+            component: Shop,
+            children: [
+                {
+                    path: 'home',
+                    component: ShopHome,
+                    meta: {
+                        title: '首页'
+                    }
+                },
+                {
+                    path: 'type',
+                    component: ServiceType,
+                    meta: {
+                        title: '分类'
+                    }
+                },
+                {
+                    path: 'mine',
+                    component: Mine,
+                    meta: {
+                        title: '我的'
+                    }
+                },
+                {
+                    path: 'order/',
+                    component: ShopOrder,
+                    children: [
+                        {
+                            path: 'myorder',
+                            component: MyOrder,
+                            meta: {
+                                title: '我的订单'
+                            }
+                        },
+                        {
+                            path: 'myapply',
+                            component: MyApply,
+                            meta: {
+                                title: '我的申请'
+                            }
+                        }
+                    ]
+                },
+                {
+                    path: 'myorderDetail',
+                    component: MyorderDetail,
+                    meta: {
+                        title: '订单详情'
+                    }
+                },
+                {
+                    path: 'myapplyDetail',
+                    component: MyapplyDetail,
+                    meta: {
+                        title: '订单详情'
+                    }
+                },
+                {
+                    path: 'myFavorite',
+                    component: MyFavorite,
+                    meta: {
+                        title: '我的收藏'
+                    }
+                },
+                {
+                    path: 'ServiceList',
+                    component: ServiceList,
+                    meta: {
+                        title: '服务列表'
+                    }
+                },
+                {
+                    path: 'serviceDetail',
+                    component: ServiceDetail,
+                    meta: {
+                        title: '服务详情'
+                    }
+                },
+                {
+                    path: 'invoice',
+                    component: MyInvoice,
+                    meta: {
+                        title: '开票信息'
+                    }
+                },
+                {
+                    path: 'addInvoice',
+                    component: AddInvoice,
+                    meta: {
+                        title: '新增开票信息'
+                    }
+                },
+                {
+                    path: 'editInvoice',
+                    component: EditInvoice,
+                    meta: {
+                        title: '编辑开票信息'
+                    }
+                },
+                {
+                    path: 'myAddress',
+                    component: MyAddress,
+                    meta: {
+                        title: '我的收货地址'
+                    }
+                },
+                {
+                    path: 'addAddress',
+                    component: AddAddress,
+                    meta: {
+                        title: '新增收货地址'
+                    }
                 },
             ]
         }

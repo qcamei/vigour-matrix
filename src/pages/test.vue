@@ -3,6 +3,7 @@
         <yd-navbar
             :title="this.$route.meta.title"
             color="#fff"
+            bgcolor="#24242c"
             fontsize=".36rem">
         </yd-navbar>
 
@@ -14,6 +15,8 @@
             <router-link to="/meeting/list">会议室预定</router-link>
             <br>
             <router-link to="/bill/list">企业账单</router-link>
+            <br>
+            <router-link to="/shop/home">服务商城</router-link>
         </div>
     </div>
 </template>
