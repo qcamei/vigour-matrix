@@ -1,6 +1,6 @@
 <template>
     <div>
-        <router-link to="/shop/serviceDetail">
+        <router-link to="/shop/serviceDetail/1/imageText">
             <div class="favorite-item">
                 <div class="img-con">
                     <img src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3601388998,136244981&fm=27&gp=0.jpg" />
@@ -18,7 +18,7 @@
             </div>
         </router-link>
 
-        <router-link to="/shop/serviceDetail">
+        <router-link to="/shop/serviceDetail/2/imageText">
             <div class="favorite-item">
                 <div class="img-con">
                     <img src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3601388998,136244981&fm=27&gp=0.jpg" />

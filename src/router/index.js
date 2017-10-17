@@ -106,6 +106,12 @@ const MyAddress = resolve => require.ensure(['../pages/shop/address/myAddress.vu
 const AddInvoice = resolve => require.ensure(['../pages/shop/invoice/addInvoice.vue'], () => resolve(require('../pages/shop/invoice/addInvoice.vue')), 'shop-group')
 const EditInvoice = resolve => require.ensure(['../pages/shop/invoice/editInvoice.vue'], () => resolve(require('../pages/shop/invoice/editInvoice.vue')), 'shop-group')
 const AddAddress = resolve => require.ensure(['../pages/shop/address/addAddress.vue'], () => resolve(require('../pages/shop/address/addAddress.vue')), 'shop-group')
+const ImageText = resolve => require.ensure(['../pages/shop/favorite/imageText.vue'], () => resolve(require('../pages/shop/favorite/imageText.vue')), 'shop-group')
+const ServiceComment = resolve => require.ensure(['../pages/shop/favorite/serviceComment.vue'], () => resolve(require('../pages/shop/favorite/serviceComment.vue')), 'shop-group')
+const WriteOrder = resolve => require.ensure(['../pages/shop/favorite/writeOrder.vue'], () => resolve(require('../pages/shop/favorite/writeOrder.vue')), 'shop-group')
+const WriteApply = resolve => require.ensure(['../pages/shop/favorite/writeApply.vue'], () => resolve(require('../pages/shop/favorite/writeApply.vue')), 'shop-group')
+const Pay = resolve => require.ensure(['../pages/shop/favorite/pay.vue'], () => resolve(require('../pages/shop/favorite/pay.vue')), 'shop-group')
+const BillSettings = resolve => require.ensure(['../pages/shop/favorite/billSettings.vue'], () => resolve(require('../pages/shop/favorite/billSettings.vue')), 'shop-group')
 
 Vue.use(Router)
 export default new Router({
@@ -403,11 +409,27 @@ export default new Router({
                     }
                 },
                 {
-                    path: 'serviceDetail',
+                    path: 'serviceDetail/:id/',
                     component: ServiceDetail,
                     meta: {
                         title: '服务详情'
-                    }
+                    },
+                    children: [
+                        {
+                            path: 'imageText',
+                            component: ImageText,
+                            meta: {
+                                title: '服务详情'
+                            }
+                        },
+                        {
+                            path: 'comment',
+                            component: ServiceComment,
+                            meta: {
+                                title: '服务详情'
+                            }
+                        }
+                    ]
                 },
                 {
                     path: 'invoice',
@@ -444,6 +466,34 @@ export default new Router({
                         title: '新增收货地址'
                     }
                 },
+                {
+                    path: 'writeOrder',
+                    component: WriteOrder,
+                    meta: {
+                        title: '填写订单'
+                    }
+                },
+                {
+                    path: 'writeApply',
+                    component: WriteApply,
+                    meta: {
+                        title: '填写申请'
+                    }
+                },
+                {
+                    path: 'pay',
+                    component: Pay,
+                    meta: {
+                        title: '订单支付'
+                    }
+                },
+                {
+                    path: 'billSettings',
+                    component: BillSettings,
+                    meta: {
+                        title: '开票设置'
+                    }
+                }
             ]
         }
     ]

@@ -198,7 +198,7 @@
                     flex-direction column
                     justify-content space-between
                     padding 0 .2rem
-                    width 2.4rem
+                    width 2.43rem
                     height 1.2rem
                     .title
                         font-size .26rem
