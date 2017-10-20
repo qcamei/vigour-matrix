@@ -6,7 +6,7 @@
                 <yd-input
                     slot="right"
                     required
-                    v-model="info.name1"
+                    v-model="info.enterpriseName"
                     placeholder="请输入企业名称"
                     ref="input0"
                 ></yd-input>
@@ -16,7 +16,7 @@
                 <yd-input
                     slot="right"
                     required
-                    v-model="info.name2"
+                    v-model="info.taxNo"
                     placeholder="请输入税号"
                     ref="input1"
                 ></yd-input>
@@ -26,7 +26,7 @@
                 <yd-input
                     slot="right"
                     required
-                    v-model="info.name3"
+                    v-model="info.address"
                     placeholder="请输入单位地址"
                     ref="input2"
                 ></yd-input>
@@ -37,7 +37,7 @@
                     slot="right"
                     type="number"
                     required
-                    v-model="info.name4"
+                    v-model="info.tel"
                     placeholder="请输入电话号码"
                     ref="input3"
                 ></yd-input>
@@ -47,7 +47,7 @@
                 <yd-input
                     slot="right"
                     required
-                    v-model="info.name5"
+                    v-model="info.bankName"
                     placeholder="请输入开户银行"
                     ref="input4"
                 ></yd-input>
@@ -58,7 +58,7 @@
                     slot="right"
                     type="number"
                     required
-                    v-model="info.name6"
+                    v-model="info.account"
                     placeholder="请输入银行账号"
                     ref="input5"
                 ></yd-input>
@@ -73,6 +73,8 @@
     </div>
 </template>
 <script>
+    import { addInvoiceInfo } from '../../../api/shopApi'
+
     export default {
         created() {
             document.title = this.$route.meta.title
@@ -80,12 +82,13 @@
         data() {
             return {
                 info: {
-                    name1: '',
-                    name2: '',
-                    name3: '',
-                    name4: '',
-                    name5: '',
-                    name6: '',
+                    enterpriseName: '',
+                    taxNo: '',
+                    address: '',
+                    tel: '',
+                    bankName: '',
+                    account: '',
+                    isDefault: false
                 }
             }
         },
@@ -102,6 +105,12 @@
                         return;
                     }
                 }
+
+                addInvoiceInfo(this.info).then(response => {
+                    if (response.body.code == 200) {
+                        this.$router.replace('/shop/invoice')
+                    }
+                })
             }
         }
     }

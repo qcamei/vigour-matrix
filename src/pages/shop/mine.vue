@@ -2,7 +2,7 @@
     <div id="mine">
         <div class="profile-con">
             <div class="avatar">
-                <img src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3601388998,136244981&fm=27&gp=0.jpg" />
+                <img v-lazy="'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3601388998,136244981&fm=27&gp=0.jpg'" />
             </div>
             <span class="username">萨瓦迪卡</span>
             <span class="parkname">张江高科技园区</span>

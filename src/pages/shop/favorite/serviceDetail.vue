@@ -1,55 +1,43 @@
 <template>
     <div style="height: 100%; padding-bottom: 1.2rem">
-        <yd-slider autoplay="3000">
-            <yd-slider-item>
-                <a href="http://www.ydcss.com">
-                    <img src="http://static.ydcss.com/uploads/ydui/1.jpg">
-                </a>
-            </yd-slider-item>
-            <yd-slider-item>
-                <a href="http://www.ydcss.com">
-                    <img src="http://static.ydcss.com/uploads/ydui/2.jpg">
-                </a>
-            </yd-slider-item>
-            <yd-slider-item>
-                <a href="http://www.ydcss.com">
-                    <img src="http://static.ydcss.com/uploads/ydui/3.jpg">
+        <yd-slider autoplay="3000" style="height: 3.8rem" v-if="info && info.listImage.length">
+            <yd-slider-item v-for="(item, idx) in info.listImage" :key="idx">
+                <a href="#">
+                    <img :src="item.path">
                 </a>
             </yd-slider-item>
         </yd-slider>
 
         <!--服务描述-->
         <div class="description">
-            <span class="title">华谊星程大厦公司注册</span>
-            <span class="detail">上海实业大厦位于上海市黄金地段徐家汇CBD商圈中心交通便捷，四通八达。</span>
+            <span class="title" v-if="info && info.mainTitle">{{ info.mainTitle }}</span>
+            <span class="detail" v-if="info && info.subTitle">{{ info.subTitle }}</span>
         </div>
 
-        <!--参数选择-->
-        <div class="settings">
-            <div class="rows">
-                <div class="label">服务单价</div>
+        <!--参数选择 orderLabels[idx].items[index].selected = true-->
+        <div class="settings" v-if="info && info.supportOrder">
+            <div class="rows" v-for="(row, idx) in orderLabels" :key="idx">
+                <div class="label">{{ row.label }}</div>
                 <div class="params-con">
-                    <span class="item">100元/1次</span>
-                    <span class="item">100元/1次</span>
-                    <span class="item">100元/1次</span>
+                    <span
+                        v-for="(item, index) in row.items"
+                        :key="index"
+                        :class="{'item': true, 'selected': item.selected, 'disabled': !item.enabled}"
+                        @click="selectEnd(item, row.items, idx)"
+                    >{{ item.item }}</span>
                 </div>
             </div>
             <div class="rows">
-                <div class="label">参数2</div>
-                <div class="params-con">
-                    <span class="item">100元/1次</span>
-                    <span class="item">100元/1次</span>
-                    <span class="item">100元/1次</span>
-                    <span class="item">100元/1次</span>
-                </div>
+                <div class="label">价格</div>
+                <div class="params-con price"><span v-if="totalPrice">￥ {{ totalPrice }}</span></div>
             </div>
         </div>
 
         <!--销量收藏评分-->
         <div class="salenum">
-            <span>销量：23</span>
-            <span>收藏：211</span>
-            <span>评分：4.5分</span>
+            <span v-if="info">销量：{{ info.orderNum }}</span>
+            <span v-if="info">收藏：{{ info.collectNum }}</span>
+            <span v-if="info">评分：{{ info.commentNum }}分</span>
         </div>
 
         <!--图文详情 & 评价-->
@@ -62,35 +50,121 @@
         </keep-alive>
 
         <div class="btn-con">
-            <div class="favorite-con">
-                <img src="../../../common/images/ic_collect@3x.png" />
-                <span>收藏</span>
+            <div class="favorite-con like" @click="addFavorite">
+                <img v-if="!isFavorite" src="../../../common/images/ic_collect@3x.png" />
+                <img v-if="isFavorite" src="../../../common/images/ic_collect_clicked@3x.png" />
+                <span v-if="!isFavorite">收藏</span>
+                <span v-if="isFavorite" style="color: #ff4f55;">收藏</span>
             </div>
-            <div v-if="true" class="serv-btn apply" @click="confirmApply">申请服务</div>
-            <div v-if="false" class="serv-btn buy" @click="confirmPay">立即购买</div>
+            <div v-if="info && !info.supportOrder" class="serv-btn apply" @click="confirmApply">申请服务</div>
+            <div v-if="info && info.supportOrder" class="serv-btn buy" @click="confirmPay">立即购买</div>
         </div>
     </div>
 </template>
 <script>
     import { Slider, SliderItem } from 'vue-ydui/dist/lib.rem/slider'
+    import { getServiceDetail, setFavorite, removeFavorite } from '../../../api/shopApi'
 
     export default {
         created() {
             document.title = this.$route.meta.title
+            getServiceDetail(this.$route.params.id).then(response => {
+                if (response.body.code == 200) {
+                    var res = response.body.data
+                    res.orderTemplate.labels.forEach(item => {
+                        item.items.forEach(cur => {
+                            cur.selected = false
+                            cur.enabled = false
+                        })
+                    })
+
+                    this.info = res
+                    this.orderLabels = res.orderTemplate.labels
+                    this.validMap = res.validMap
+                    this.validIds = res.validIds
+                    this.isFavorite = res.isCollect
+
+                    this.orderLabels[0].items.forEach(item => {
+                        this.validIds.forEach(cur => {
+                            cur == item.id ? item.enabled = true : false
+                        })
+                    })
+                }
+            })
         },
         data() {
-            return {}
+            return {
+                info: null,
+                validMap: null,
+                orderLabels: null,
+                validIds: null,
+                isFavorite: false,
+                totalPrice: '',
+                specificationNo: ''
+            }
         },
         components: {
             [Slider.name]: Slider,
             [SliderItem.name]: SliderItem
         },
+        watch: {
+            orderLabels: {
+                handler(cur, old) {
+                },
+                deep: true
+            }
+        },
         methods: {
+            addFavorite() {
+                this.isFavorite ? removeFavorite(this.info.id) : setFavorite(this.info.id)
+                this.isFavorite = !this.isFavorite
+            },
             confirmApply() {
                 this.$router.push('/shop/writeApply')
             },
             confirmPay() {
-                this.$router.push('/shop/writeOrder')
+                if (!this.specificationNo) {
+                    return this.$dialog.toast({
+                        mes: '请选择',
+                        timeout: 500
+                    })
+                }
+                this.$router.push({
+                    path: '/shop/writeOrder',
+                    query: {
+                        specificationId: this.specificationNo,
+                        serviceProId: this.$route.params.id,
+                        tempPrice: this.totalPrice
+                    }
+                })
+            },
+            selectEnd(item, row, rowIndex) {
+                if (!item.enabled) return
+
+                row.forEach(cur => cur.selected = false)
+                item.selected = true
+
+                if (rowIndex < this.orderLabels.length - 1) {
+                    this.totalPrice = this.specificationNo = ''
+                    this.orderLabels[rowIndex + 1].items.forEach(cur => {
+                        let flag = this.validMap[item.id].find(val => val == cur.id)
+                        cur.enabled = flag ? true : false
+                    })
+                }
+
+                if (rowIndex === this.orderLabels.length - 1) {
+                    let totalId_ = ''
+                    this.orderLabels.forEach(item => {
+                        item.items.forEach(cur => {
+                            if (cur.selected) {
+                                totalId_ += cur.id + '_'
+                            }
+                        })
+                    })
+                    let totalId = totalId_.slice(0, totalId_.length - 1)
+                    this.totalPrice = this.info.priceMap[totalId]
+                    this.specificationNo = this.info.specificationMap[totalId]
+                }
             }
         }
     }
@@ -130,6 +204,12 @@
                 flex-wrap wrap
                 width 100%
                 margin-left .08rem
+                &.price
+                    font-size .26rem
+                    color #e65966
+                    display flex
+                    align-items center
+                    height .5rem
                 .item
                     font-size .26rem
                     color #999
@@ -142,6 +222,12 @@
                     margin-left .12rem
                     margin-bottom .12rem
                     padding 0 .25rem
+                    &.selected
+                        color #e65966
+                        border-color #e65966
+                    &.disabled
+                        color #e4e5e6
+                        border-color #e4e5e6
     .salenum
         display flex
         justify-content space-between
@@ -178,6 +264,7 @@
         bottom 0
         width 100%
         height 1rem
+        background-color #fff
         .favorite-con
             display flex
             flex-direction column

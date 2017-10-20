@@ -1,19 +1,31 @@
 <template>
-    <div>tuwen</div>
+    <div id="imageText" v-html="info.content" v-if="info"></div>
 </template>
 <script>
+    import { getServiceDetail } from '../../../api/shopApi'
+
     export default {
         created() {
             document.title = this.$route.meta.title
-            console.log(this.$route.params.id)
+            getServiceDetail(this.$route.params.id).then(response => {
+                if (response.body.code == 200) {
+                    this.info = response.body.data
+                }
+            })
         },
         data() {
-            return {}
+            return {
+                info: null
+            }
         },
         components: {},
         methods: {}
     }
 </script>
 <style scoped lang="stylus" rel="stylesheet/stylus">
-
+    #imageText
+        width 100%
+        background-color #fff
+        font-size .26rem
+        padding .2rem
 </style>

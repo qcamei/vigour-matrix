@@ -28,7 +28,7 @@
                     slot="right"
                     type="text"
                     @click.stop="showCity = true"
-                    v-model="info.districts"
+                    v-model="newDistricts"
                     readonly
                     placeholder="请选择地区"
                 />
@@ -54,7 +54,7 @@
                 bgcolor="#00A7A3"
                 color="#fff"
                 style="width: 100%"
-            >确定</yd-button>
+            >确认修改</yd-button>
         </div>
 
         <yd-cityselect v-model="showCity" :callback="selectCallback" :items="district"></yd-cityselect>
@@ -63,18 +63,29 @@
 <script>
     import { CitySelect } from 'vue-ydui/dist/lib.rem/cityselect'
     import District from 'ydui-district/dist/jd_province_city_area_id'
-    import { addAddress } from '../../../api/shopApi'
+    import { getMyAddressSingle, editAddress } from '../../../api/shopApi'
 
     export default {
         created() {
             document.title = this.$route.meta.title
+            getMyAddressSingle(this.$route.params.id).then(response => {
+                if (response.body.code == 200) {
+                    this.info = response.body.data
+                    console.log(this.info)
+                }
+            })
+        },
+        computed: {
+            newDistricts() {
+                return this.info.proviceName + ' ' + this.info.cityName + ' ' + this.info.countyName
+            }
         },
         data() {
             return {
                 info: {
                     contacts: '',
                     phone: '',
-                    districts: '',
+                    districts: '湖北省 随州市 曾都区',
                     addr: '',
                 },
                 showCity: false,
@@ -104,20 +115,22 @@
                     isDefault: true
                 }
 
-                this.info.districts.split(' ').forEach((item,idx) => {
+                this.newDistricts.split(' ').forEach((item,idx) => {
                     idx === 0 ? postInfo.proviceName = item : void 0;
                     idx === 1 ? postInfo.cityName = item : void 0;
                     idx === 2 ? postInfo.countyName = item : void 0;
                 })
 
-                addAddress(postInfo).then(response => {
+                editAddress(postInfo, this.$route.params.id).then(response => {
                     if (response.body.code == 200) {
                         this.$router.replace('/shop/myAddress')
                     }
                 })
             },
             selectCallback(ret) {
-                this.info.districts = ret.itemName1 + ' ' + ret.itemName2 + ' ' + ret.itemName3;
+                this.info.proviceName = ret.itemName1
+                this.info.cityName = ret.itemName2
+                this.info.countyName = ret.itemName3
             }
         }
     }

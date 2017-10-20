@@ -1,10 +1,10 @@
 <template>
     <div id="invoiceInfo">
         <yd-cell-group>
-            <yd-cell-item style="position: relative;">
-                <span slot="left">上海速道科技有限公司</span>
+            <yd-cell-item style="position: relative;" v-if="info.length" v-for="(item, idx) in info" :key="idx">
+                <span slot="left">{{ item.enterpriseName }}</span>
                 <span slot="right">
-                    <img @click="editInvoice" class="edit-icon" src="../../../common/images/ic_edit@3x.png" />
+                    <img @click="editInvoice(item.id)" class="edit-icon" src="../../../common/images/ic_edit@3x.png" />
                 </span>
             </yd-cell-item>
             <yd-cell-item @click.native="addInvoice">
@@ -15,17 +15,26 @@
     </div>
 </template>
 <script>
+    import { getInvoiceInfo } from '../../../api/shopApi'
+
     export default {
         created() {
             document.title = this.$route.meta.title
+            getInvoiceInfo().then(response => {
+                if (response.body.code == 200) {
+                    this.info = response.body.data.items
+                }
+            })
         },
         data() {
-            return {}
+            return {
+                info: []
+            }
         },
         components: {},
         methods: {
-            editInvoice() {
-                this.$router.push('/shop/editInvoice')
+            editInvoice(id) {
+                this.$router.push('/shop/editInvoice/' + id)
             },
             addInvoice() {
                 this.$router.push('/shop/addInvoice')

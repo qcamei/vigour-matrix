@@ -1,53 +1,101 @@
 <template>
     <div>
-        <router-link to="/shop/serviceDetail/1/imageText">
-            <div class="favorite-item">
-                <div class="img-con">
-                    <img src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3601388998,136244981&fm=27&gp=0.jpg" />
-                </div>
-                <div class="disc-con">
-                    <div class="top">
-                        <div class="title">华谊星程大厦公司注册</div>
-                        <div class="status"></div>
-                    </div>
-                    <div class="bottom">
-                        <div class="price">¥ 12000.00</div>
-                        <div class="datetime">2016-09-20 10:00</div>
-                    </div>
-                </div>
-            </div>
-        </router-link>
+        <yd-infinitescroll :callback="loadList" :distance="50" ref="infinitescrollDemo">
+            <yd-list slot="list">
+                <router-link :to="`/shop/serviceDetail/${item.id}/imageText`" v-for="(item, idx) in list" :key="idx">
+                    <mx-slide-delete :itemId="item.id" @deleteItem="deleteItem(item.id)" ref="deleteCon">
+                        <div class="favorite-item">
+                            <div class="img-con">
+                                <img v-lazy="item.mainImage[0].path" />
+                            </div>
+                            <div class="disc-con">
+                                <div class="top">
+                                    <div class="title">{{ item.mainTitle }}</div>
+                                    <div class="status" v-if="item.approvalStatus === 'UNPUBLISH'">已下架</div>
+                                </div>
+                                <div class="bottom">
+                                    <div class="price"></div>
+                                    <div class="datetime">{{ item.createTime }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </mx-slide-delete>
+                </router-link>
+            </yd-list>
+        </yd-infinitescroll>
 
-        <router-link to="/shop/serviceDetail/2/imageText">
-            <div class="favorite-item">
-                <div class="img-con">
-                    <img src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3601388998,136244981&fm=27&gp=0.jpg" />
-                </div>
-                <div class="disc-con">
-                    <div class="top">
-                        <div class="title">华谊星程大厦公司注册</div>
-                        <div class="status">已下架</div>
-                    </div>
-                    <div class="mid">删除</div>
-                    <div class="bottom">
-                        <div class="price">¥ 12000.00</div>
-                        <div class="datetime">2016-09-20 10:00</div>
-                    </div>
-                </div>
-            </div>
-        </router-link>
+        <div v-show="historyFlag" class="no-history"><span>暂无数据</span></div>
     </div>
 </template>
 <script>
+    import MxSlideDelete from '../../../components/slideDelete/MxSlideDelete.vue'
+    import { getFavoriteList, removeFavorite } from '../../../api/shopApi'
+
     export default {
         created() {
             document.title = this.$route.meta.title
+            this.loadList()
         },
         data() {
-            return {}
+            return {
+                page: 1,
+                limit: 10,
+                list: [],
+                historyFlag: false
+            }
         },
-        components: {},
-        methods: {}
+        components: {
+            MxSlideDelete
+        },
+        methods: {
+            deleteItem(id) {
+                removeFavorite(id).then(response => {
+                    if (response.body.code == 200) {
+                        this.list = this.list.filter(item => item.id != id)
+                        this.$refs.deleteCon.forEach(item => item.txtStyle = '')
+                    }
+                })
+            },
+            loadList() {
+                this.$dialog.loading.open('加载中')
+                getFavoriteList({
+                    page: this.page,
+                    limit: this.limit
+                })
+                    .then(response => {
+                        if (response.body.code == 200) {
+                            const _list = response.body.data.items
+
+                            this.list = [...this.list, ..._list]
+
+                            if (this.list.length === 0) {
+                                this.$dialog.loading.close()
+                                this.historyFlag = true
+                                return
+                            }
+
+                            if (_list.length < this.limit) {
+                                /* 所有数据加载完毕 */
+                                this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.loadedDone')
+                                this.$dialog.loading.close()
+                                return
+                            }
+
+                            /* 单次请求数据完毕 */
+                            this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.finishLoad')
+                            this.$dialog.loading.close()
+                            this.page++
+                        }
+                        else {
+                            this.$dialog.loading.close()
+                            this.$dialog.toast({
+                                mes: response.body.message,
+                                timeout: 500
+                            })
+                        }
+                    }).catch(e => console.log(e))
+            },
+        }
     }
 </script>
 <style scoped lang="stylus" rel="stylesheet/stylus">
@@ -105,4 +153,26 @@
                 .datetime
                     font-size .26rem
                     color #999
+    .no-history
+        width 6rem
+        height 4.4rem
+        background-image url('../../../common/images/ic_no history@3x.png')
+        background-size 6rem 4.4rem
+        background-repeat no-repeat
+        position absolute
+        left 50%
+        top 45%
+        margin-top -2.2rem
+        margin-left -3rem
+        span
+            font-size .3rem
+            color #333
+            position absolute
+            bottom -.6rem
+            left 50%
+            transform translateX(-50%)
+    .list-loading
+        height 1.86rem
+    .list-donetip
+        padding .25rem 0 1.45rem
 </style>

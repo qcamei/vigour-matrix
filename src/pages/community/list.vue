@@ -68,27 +68,36 @@
                     limit: this.limit
                 })
                     .then(response => {
-                        const _list = response.body.data.items
+                        if (response.body.code == 200) {
+                            const _list = response.body.data.items
 
-                        this.list = [...this.list, ..._list]
+                            this.list = [...this.list, ..._list]
 
-                        if (this.list.length === 0) {
+                            if (this.list.length === 0) {
+                                this.$dialog.loading.close()
+                                this.historyFlag = true
+                                return
+                            }
+
+                            if (_list.length < this.limit) {
+                                /* 所有数据加载完毕 */
+                                this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.loadedDone')
+                                this.$dialog.loading.close()
+                                return
+                            }
+
+                            /* 单次请求数据完毕 */
+                            this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.finishLoad')
                             this.$dialog.loading.close()
-                            this.historyFlag = true
-                            return
+                            this.page++
                         }
-
-                        if (_list.length < this.limit) {
-                            /* 所有数据加载完毕 */
-                            this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.loadedDone')
+                        else {
                             this.$dialog.loading.close()
-                            return
+                            this.$dialog.toast({
+                                mes: response.body.message,
+                                timeout: 500
+                            })
                         }
-
-                        /* 单次请求数据完毕 */
-                        this.$refs.infinitescrollDemo.$emit('ydui.infinitescroll.finishLoad')
-                        this.$dialog.loading.close()
-                        this.page++
                     }).catch(e => console.log(e))
             }
         }

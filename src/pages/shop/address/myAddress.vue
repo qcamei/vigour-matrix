@@ -2,12 +2,16 @@
     <div>
         <div class="address-item" v-for="item in infos" @click="changeAddress(item)">
             <div class="icon-con">
-                <div :class="['check-icon', item.checked ? 'checked' : '']"></div>
+                <div :class="['check-icon', item.isDefault ? 'checked' : '']"></div>
             </div>
             <div class="info-con">
-                <span class="name">萨瓦迪卡</span>
-                <span class="address">上海市浦东新区西藏南路387号</span>
+                <span class="top">
+                    <span class="name">{{ item.contacts }}</span>
+                    <span v-if="false" class="phone">{{ item.phone }}</span>
+                </span>
+                <span class="address">{{ item.proviceName }}{{ item.cityName }}{{ item.countyName }}{{ item.addr }}</span>
             </div>
+            <div class="edit-arrow" @click.stop="$router.push(`/shop/editAddress/${item.id}`)"></div>
         </div>
 
         <div class="address-item" style="height: 1.3rem" @click="addAddress">
@@ -21,34 +25,32 @@
     </div>
 </template>
 <script>
+    import { getMyAddress, setDefaultAddress } from '../../../api/shopApi'
     export default {
+        created() {
+            document.title = this.$route.meta.title
+            getMyAddress().then(response => {
+                if (response.body.code == 200) {
+                    this.infos = response.body.data.items
+                }
+            })
+        },
         data() {
             return {
-                infos: [
-                    {
-                        name: '萨瓦迪卡',
-                        address: '上海市浦东新区西藏南路387号',
-                        checked: true
-                    },
-                    {
-                        name: '萨瓦迪卡',
-                        address: '上海市浦东新区西藏南路387号',
-                        checked: false
-                    },
-                    {
-                        name: '萨瓦迪卡',
-                        address: '上海市浦东新区西藏南路387号',
-                        checked: false
-                    }
-                ]
+                infos: null
             }
         },
         components: {
         },
         methods: {
             changeAddress(item) {
-                this.infos.forEach(item => item.checked = false)
-                item.checked = true
+                this.infos.forEach(item => item.isDefault = false)
+                item.isDefault = true
+                setDefaultAddress(item.id).then(response => {
+                    if (response.body.code == 200) {
+                        this.$router.go(-1)
+                    }
+                })
             },
             addAddress() {
                 this.$router.push('/shop/addAddress')
@@ -64,7 +66,7 @@
         display flex
         border-bottom 1px solid #e7e7e7
         background-color #fff
-        padding .3rem .6rem .3rem 0
+        padding .3rem .8rem .3rem 0
         &:after
             position absolute
             right .2rem
@@ -102,10 +104,25 @@
             flex-direction column
             justify-content center
             padding-left .8rem
-            .name
-                font-size .26rem
+            width 100%
+            .top
+                display flex
+                justify-content space-between
+                .name
+                    font-size .26rem
+                .phone
+                    font-size .26rem
             .address
                 font-size .24rem
                 margin-top .14rem
                 line-height 1.2
+            .name
+                font-size .26rem
+        .edit-arrow
+            width .8rem
+            height 100%
+            position absolute
+            right 0
+            top 0
+            z-index 10
 </style>

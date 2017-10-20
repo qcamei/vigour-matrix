@@ -76,18 +76,30 @@
             this.$dialog.loading.open('加载中...')
             getMeetingList(moment().format('YYYY-MM-DD'))
                 .then(res => {
-                    res.body.data.forEach(item => this.roomList.push(item.name))
-                    return this.infos.push({
-                        date: moment().format('MM月DD日'),
-                        room: res.body.data,
-                    })
+                    if (res.body.code == 200) {
+                        res.body.data.forEach(item => this.roomList.push(item.name))
+                        return this.infos.push({
+                            date: moment().format('MM月DD日'),
+                            room: res.body.data,
+                        })
+                    }
+                    else {
+                        this.$dialog.loading.close()
+                        this.$dialog.toast({
+                            mes: res.body.message,
+                            timeout: 500
+                        })
+                    }
                 })
                 .then(() => this.getOffsetDate(1))
                 .then(() => this.getOffsetDate(2))
                 .then(() => this.getOffsetDate(3))
                 .then(() => this.getOffsetDate(4))
                 .then(() => this.$dialog.loading.close())
-                .catch(e => console.log(e))
+                .catch(e => {
+                    this.$dialog.loading.close()
+                    console.log(e)
+                })
         },
         data() {
             return {

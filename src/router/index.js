@@ -106,6 +106,7 @@ const MyAddress = resolve => require.ensure(['../pages/shop/address/myAddress.vu
 const AddInvoice = resolve => require.ensure(['../pages/shop/invoice/addInvoice.vue'], () => resolve(require('../pages/shop/invoice/addInvoice.vue')), 'shop-group')
 const EditInvoice = resolve => require.ensure(['../pages/shop/invoice/editInvoice.vue'], () => resolve(require('../pages/shop/invoice/editInvoice.vue')), 'shop-group')
 const AddAddress = resolve => require.ensure(['../pages/shop/address/addAddress.vue'], () => resolve(require('../pages/shop/address/addAddress.vue')), 'shop-group')
+const EditAddress = resolve => require.ensure(['../pages/shop/address/editAddress.vue'], () => resolve(require('../pages/shop/address/editAddress.vue')), 'shop-group')
 const ImageText = resolve => require.ensure(['../pages/shop/favorite/imageText.vue'], () => resolve(require('../pages/shop/favorite/imageText.vue')), 'shop-group')
 const ServiceComment = resolve => require.ensure(['../pages/shop/favorite/serviceComment.vue'], () => resolve(require('../pages/shop/favorite/serviceComment.vue')), 'shop-group')
 const WriteOrder = resolve => require.ensure(['../pages/shop/favorite/writeOrder.vue'], () => resolve(require('../pages/shop/favorite/writeOrder.vue')), 'shop-group')
@@ -402,7 +403,7 @@ export default new Router({
                     }
                 },
                 {
-                    path: 'ServiceList',
+                    path: 'ServiceList/:id',
                     component: ServiceList,
                     meta: {
                         title: '服务列表'
@@ -446,7 +447,7 @@ export default new Router({
                     }
                 },
                 {
-                    path: 'editInvoice',
+                    path: 'editInvoice/:id',
                     component: EditInvoice,
                     meta: {
                         title: '编辑开票信息'
@@ -464,6 +465,13 @@ export default new Router({
                     component: AddAddress,
                     meta: {
                         title: '新增收货地址'
+                    }
+                },
+                {
+                    path: 'editAddress/:id',
+                    component: EditAddress,
+                    meta: {
+                        title: '编辑收货地址'
                     }
                 },
                 {
@@ -488,7 +496,7 @@ export default new Router({
                     }
                 },
                 {
-                    path: 'billSettings',
+                    path: 'billSettings/:id',
                     component: BillSettings,
                     meta: {
                         title: '开票设置'

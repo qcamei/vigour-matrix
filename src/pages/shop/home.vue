@@ -1,96 +1,103 @@
 <template>
     <div style="padding-bottom: 1.2rem">
         <yd-slider autoplay="3000" class="banner-con">
-            <yd-slider-item>
+            <yd-slider-item v-for="(banner, idx) in banners" :key="idx">
                 <router-link to="#">
-                    <img src="http://static.ydcss.com/uploads/ydui/1.jpg">
-                </router-link>
-            </yd-slider-item>
-            <yd-slider-item>
-                <router-link to="#">
-                    <img src="http://static.ydcss.com/uploads/ydui/2.jpg">
-                </router-link>
-            </yd-slider-item>
-            <yd-slider-item>
-                <router-link to="#">
-                    <img src="http://static.ydcss.com/uploads/ydui/3.jpg">
+                    <img v-lazy="banner.imageUrl" />
                 </router-link>
             </yd-slider-item>
         </yd-slider>
 
         <div class="type-con">
-            <router-link to="/shop/serviceList" class="type-item">
-                <img src="../../common/images/ic_money@3x.png" />
-                <span>资金服务</span>
-            </router-link>
-            <router-link to="/shop/serviceList" class="type-item">
-                <img src="../../common/images/ic_tax@3x.png" />
-                <span>工商财税</span>
-            </router-link>
-            <router-link to="/shop/serviceList" class="type-item">
-                <img src="../../common/images/ic_human_resource@3x.png" />
-                <span>人力资源</span>
-            </router-link>
-            <router-link to="/shop/serviceList" class="type-item">
-                <img src="../../common/images/ic_market@3x.png" />
-                <span>市场营销</span>
-            </router-link>
-            <router-link to="/shop/serviceList" class="type-item">
-                <img src="../../common/images/ic_welfare@3x.png" />
-                <span>企业福利</span>
-            </router-link>
-            <router-link to="/shop/serviceList" class="type-item">
-                <img src="../../common/images/ic_money@3x.png" />
-                <span>资金服务</span>
+            <!--`/shop/serviceList/${type.id}`-->
+            <router-link v-for="(type, idx) in types" :key="idx" :to="{path: '/shop/serviceList/' + type.id, query: {mode: 'type'}}" class="type-item">
+                <img v-lazy="type.typeLogo" />
+                <span>{{ type.name }}</span>
             </router-link>
         </div>
 
-        <div class="service-item">
+        <!--商城活动-->
+        <div class="service-item" v-if="shopActivities">
             <div class="img-con">
-                <img src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=3340904242,373088440&fm=200&gp=0.jpg" />
+                <img v-lazy="shopActivities.imageUrl" />
             </div>
             <div class="sub-con">
-                <router-link to="#" v-for="n in 8" :key="n" class="sub-item">
+                <router-link to="#" v-for="(activity, idx) in shopActivities.activityItems" :key="idx" class="sub-item">
                     <div class="thumb-con">
-                        <img src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3601388998,136244981&fm=27&gp=0.jpg" />
+                        <img v-lazy="activity.serviceProjectMap.mainImage" />
                     </div>
                     <div class="text">
-                        <span class="title">Penelopeport</span>
-                        <span class="desc">法律服务的内容包括诉讼业务服务和非诉讼业务服务</span>
+                        <span class="title">{{ activity.serviceProjectMap.mainTitle }}</span>
+                        <span class="desc">{{ activity.serviceProjectMap.synopsis }}</span>
                     </div>
                 </router-link>
             </div>
         </div>
 
-        <div class="service-item">
+        <!--精选服务-->
+        <div class="service-item" v-if="specials">
             <div class="img-con">
-                <img src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=3340904242,373088440&fm=200&gp=0.jpg" />
+                <img v-lazy="specials.imageUrl" />
             </div>
             <div class="sub-con">
-                <router-link to="#" v-for="n in 4" :key="n" class="sub-item">
+                <router-link to="#" v-for="(special, idx) in specials.siftItems" :key="idx" class="sub-item">
                     <div class="thumb-con">
-                        <img src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3601388998,136244981&fm=27&gp=0.jpg" />
+                        <img v-lazy="special.serviceProjectMap.mainImage" />
                     </div>
                     <div class="text">
-                        <span class="title">Penelopeport</span>
-                        <span class="desc">法律服务的内容包括诉讼业务服务和非诉讼业务服务</span>
+                        <span class="title">{{ special.serviceProjectMap.mainTitle }}</span>
+                        <span class="desc">{{ special.serviceProjectMap.synopsis }}</span>
                     </div>
                 </router-link>
             </div>
         </div>
 
-        <div class="service-item">
-            <div class="img-con">
+        <!--服务类型-->
+        <div class="service-item" v-if="serviceTypes">
+            <div class="sub-con">
+                <router-link :to="{path: `/shop/serviceList/${serviceTypes[idx].id}`, query: {mode: 'type'}}" v-for="(serviceType, idx) in serviceTypes" :key="idx" class="sub-item">
+                    <div class="thumb-con">
+                        <img v-lazy="serviceType.typeLogo" />
+                    </div>
+                    <div class="text">
+                        <span class="title">{{ serviceType.name }}</span>
+                        <span class="desc">{{ serviceType.describle }}</span>
+                    </div>
+                </router-link>
+            </div>
+        </div>
+
+        <!--服务场景-->
+        <div class="service-item" v-if="stages">
+            <div class="img-con" v-if="false">
                 <img src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=3340904242,373088440&fm=200&gp=0.jpg" />
             </div>
             <div class="sub-con">
-                <router-link to="#" v-for="n in 4" :key="n" class="sub-item">
+                <router-link :to="{path: `/shop/serviceList/${stages[idx].id}`, query: {mode: 'stage'}}" v-for="(stage, idx) in stages" :key="idx" class="sub-item">
                     <div class="thumb-con">
-                        <img src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3601388998,136244981&fm=27&gp=0.jpg" />
+                        <img v-lazy="stage.scaneLogo" />
                     </div>
                     <div class="text">
-                        <span class="title">Penelopeport</span>
-                        <span class="desc">法律服务的内容包括诉讼业务服务和非诉讼业务服务</span>
+                        <span class="title">{{ stage.name }}</span>
+                        <span class="desc">{{ stage.describle }}</span>
+                    </div>
+                </router-link>
+            </div>
+        </div>
+
+        <!--园区自营-->
+        <div class="service-item" v-if="parkSelf">
+            <div class="img-con" v-if="false">
+                <img src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=3340904242,373088440&fm=200&gp=0.jpg" />
+            </div>
+            <div class="sub-con">
+                <router-link :to="{path: `/shop/serviceList/${parkSelf[idx].serviceProId}`, query: {mode: 'self'}}" v-for="(self, idx) in parkSelf" :key="idx" class="sub-item">
+                    <div class="thumb-con">
+                        <img v-lazy="self.mainImage" />
+                    </div>
+                    <div class="text">
+                        <span class="title">{{ self.mainTitle }}</span>
+                        <span class="desc">{{ self.synopsis }}</span>
                     </div>
                 </router-link>
             </div>
@@ -117,13 +124,83 @@
 <script>
     import { TabBar, TabBarItem } from 'vue-ydui/dist/lib.rem/tabbar'
     import { Slider, SliderItem } from 'vue-ydui/dist/lib.rem/slider'
+    import {
+        MockLogin,
+        getHomeBanner,
+        getHomeType,
+        getShopActivity,
+        getSpecialService,
+        getServiceType,
+        getServiceStage,
+        getParkSelfSale
+    } from '../../api/shopApi'
 
     export default {
         created() {
             document.title = this.$route.meta.title
+            MockLogin().then(response => {
+                if (response.body.code == 200) {
+                    // 首页banner
+                    getHomeBanner().then(response => {
+                        if (response.body.code == 200) {
+                            this.banners = response.body.data.bannerItems
+                        }
+                    })
+
+                    // 首页服务类型
+                    getHomeType().then(response => {
+                        if (response.body.code == 200) {
+                            this.types = response.body.data
+                        }
+                    })
+
+                    // 商城活动
+                    getShopActivity().then(response => {
+                        if (response.body.code == 200) {
+                            this.shopActivities = response.body.data[0]
+                        }
+                    })
+
+                    // 精选服务
+                    getSpecialService().then(response => {
+                        if (response.body.code == 200) {
+                            this.specials = response.body.data[0]
+                        }
+                    })
+
+                    // 服务类型
+                    getServiceType().then(response => {
+                        if (response.body.code == 200) {
+                            this.serviceTypes = response.body.data.items
+                        }
+                    })
+
+                    // 服务场景
+                    getServiceStage().then(response => {
+                        if (response.body.code == 200) {
+                            this.stages = response.body.data.items
+                        }
+                    })
+
+                    // 园区自营
+                    getParkSelfSale().then(response => {
+                        if (response.body.code == 200) {
+                            this.parkSelf = response.body.data
+                        }
+                    })
+                }
+            })
         },
         data() {
-            return {}
+            return {
+                banners: null,
+                types: null,
+                shopActivities: null,
+                specials: null,
+                serviceTypes: null,
+                stages: null,
+                parkSelf: null
+            }
         },
         components: {
             [TabBar.name]: TabBar,
@@ -131,12 +208,14 @@
             [Slider.name]: Slider,
             [SliderItem.name]: SliderItem
         },
-        methods: {}
+        methods: {
+        }
     }
 </script>
 <style scoped lang="stylus" rel="stylesheet/stylus">
     .banner-con
         width 100%
+        height 3.6rem
         overflow hidden
         img
             width 100%

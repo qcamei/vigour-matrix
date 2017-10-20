@@ -9,10 +9,10 @@
 
         <yd-cell-group>
             <yd-cell-item style="position: relative;" v-for="(item, idx) in items" :key="idx" @click.native="changeChecked(item)">
-                <span slot="icon" :class="['check-icon', item.checked ? 'checked' : '']"></span>
-                <span slot="left">{{ item.company }}</span>
+                <span slot="icon" :class="['check-icon', item.isDefault ? 'checked' : '']"></span>
+                <span slot="left">{{ item.enterpriseName }}</span>
                 <span slot="right">
-                    <img @click.stop="editInvoice" class="edit-icon" src="../../../common/images/ic_edit@3x.png"/>
+                    <img @click.stop="editInvoice(item.id)" class="edit-icon" src="../../../common/images/ic_edit@3x.png"/>
                 </span>
             </yd-cell-item>
             <yd-cell-item @click.native="addInvoice">
@@ -29,35 +29,38 @@
     </div>
 </template>
 <script>
+    import { getInvoiceInfo, setDefaultInvoice } from '../../../api/shopApi'
+
     export default {
         created() {
             document.title = this.$route.meta.title
+            getInvoiceInfo().then(response => {
+                if (response.body.code == 200 && response.body.data.items.length) {
+                    this.items = response.body.data.items
+                }
+            })
         },
         data() {
             return {
-                items: [
-                    {
-                        checked: false,
-                        company: '上海速道科技有限公司'
-                    },
-                    {
-                        checked: false,
-                        company: '京东'
-                    },
-                ]
+                items: null
             }
         },
         components: {},
         methods: {
             makeSure() {
-                this.$router.replace('/shop/writeOrder')
+                var flag = this.items.find(item => item.isDefault)
+                if (!flag) return
+
+                sessionStorage.setItem('invoice_' + this.$route.params.id, flag.id)
+                this.$router.go(-1)
             },
             changeChecked(item) {
-                this.items.forEach(item => item.checked = false)
-                item.checked = true
+                this.items.forEach(item => item.isDefault = false)
+                item.isDefault = true
+                setDefaultInvoice(item.id)
             },
-            editInvoice() {
-                this.$router.push('/shop/editInvoice')
+            editInvoice(id) {
+                this.$router.push('/shop/editInvoice/' + id)
             },
             addInvoice() {
                 this.$router.push('/shop/addInvoice')

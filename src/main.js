@@ -54,6 +54,15 @@ Vue.component(TextArea.name, TextArea);
 import {Input} from 'vue-ydui/dist/lib.rem/input';
 Vue.component(Input.name, Input);
 
+import VueLazyload from 'vue-lazyload'
+Vue.use(VueLazyload, {
+    preLoad: 1.3,
+    // error: 'static/loading.gif',
+    // loading: 'static/loading.gif',
+    attempt: 1,
+    try: 2
+})
+
 new Vue({
     el: '#app',
     router,

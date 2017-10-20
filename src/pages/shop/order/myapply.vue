@@ -52,6 +52,7 @@
         background-color #fff
         margin-top .2rem
         display inline-block
+        width 100%
         .title-con
             height .8rem
             padding 0 .2rem
@@ -68,6 +69,7 @@
             border-top 1px solid #f3f4f5
             padding .2rem .4rem
             overflow hidden
+            display flex
             .thumb
                 width 1.6rem
                 height 1.6rem

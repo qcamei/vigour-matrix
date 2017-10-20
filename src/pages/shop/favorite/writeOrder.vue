@@ -4,25 +4,25 @@
             <div class="icon-con">
                 <div class="local-icon"></div>
             </div>
-            <div class="info-con">
-                <span class="name">张三 &nbsp;&nbsp;&nbsp;&nbsp; 18019291929</span>
-                <span class="address">上海市浦东新区西藏南路387号</span>
+            <div class="info-con" v-if="defaultAddress">
+                <span class="name">{{ defaultAddress.contacts }} &nbsp;&nbsp;&nbsp;&nbsp; {{ defaultAddress.phone }}</span>
+                <span class="address">{{ defaultAddress.proviceName + defaultAddress.cityName + defaultAddress.countyName + defaultAddress.addr }}</span>
             </div>
         </div>
 
-        <div class="service-con">
+        <div class="service-con" v-if="servicePro">
             <div class="thumb">
-                <img src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3601388998,136244981&fm=27&gp=0.jpg" />
+                <img v-lazy="servicePro.mainImage[0].path" />
             </div>
             <div class="content">
-                <span class="title">张江世纪花园排水修复工作张江世纪花园排水</span>
-                <span class="text-red">¥ 12,000.00</span>
+                <span class="title">{{ servicePro.mainTitle }}</span>
+                <span class="text-red">¥ {{ $route.query.tempPrice }}</span>
             </div>
         </div>
 
         <div class="total-price">
             <span class="label">订单总金额</span>
-            <span class="value">¥ 12,000.00</span>
+            <span class="value">¥ {{ $route.query.tempPrice }}</span>
         </div>
 
         <yd-cell-group style="margin-bottom: .2rem">
@@ -31,12 +31,25 @@
             </yd-cell-item>
         </yd-cell-group>
 
-        <yd-cell-group style="margin-bottom: .2rem">
-            <yd-cell-item arrow @click.native="billSetting">
+        <yd-cell-group style="margin-bottom: .2rem" v-if="!invoiceInfo">
+            <yd-cell-item arrow @click.native="billSetting" style="padding-left: .2rem">
                 <span slot="left">发票</span>
                 <span slot="right">不开票</span>
             </yd-cell-item>
         </yd-cell-group>
+
+        <div class="invoice-con" style="margin-bottom: .2rem" v-if="invoiceInfo">
+            <div class="title">发票</div>
+            <yd-cell-group>
+                <yd-cell-item arrow @click.native="">
+                    <span slot="left">{{ invoiceInfo.enterpriseName }}</span>
+                </yd-cell-item>
+                <yd-cell-item arrow>
+                    <span slot="left">发票内容</span>
+                    <span slot="right" class="detail" @click="$router.push('/shop/editInvoice/' + invoiceInfo.id)">明细</span>
+                </yd-cell-item>
+            </yd-cell-group>
+        </div>
 
         <div class="posts-btn-con">
             <yd-button @click.native="cancel" class="posts-btn" type="hollow" bgcolor="#fff" color="#00A7A3"
@@ -48,22 +61,51 @@
     </div>
 </template>
 <script>
+    import {
+        getMyAddress,
+        getServiceDetail,
+        getInvoiceInfo
+    } from '../../../api/shopApi'
     export default {
         created() {
             document.title = this.$route.meta.title
+
+            getMyAddress().then(response => {
+                if (response.body.code == 200) {
+                    this.defaultAddress = response.body.data.items.find(item => item.isDefault)
+                }
+            })
+
+            getServiceDetail(this.$route.query.serviceProId).then(response => {
+                if (response.body.code == 200) {
+                    this.servicePro = response.body.data
+                }
+            })
+
+            let invoiceId = sessionStorage.getItem('invoice_' + this.$route.query.serviceProId)
+            if (invoiceId) {
+                getInvoiceInfo().then(response => {
+                    if (response.body.code == 200) {
+                        this.invoiceInfo = response.body.data.items.find(item => item.id = invoiceId)
+                    }
+                })
+            }
         },
         data() {
             return {
+                defaultAddress: null,
+                servicePro: null,
+                invoiceInfo: null
             }
         },
         components: {
         },
         methods: {
             changeAddress() {
-
+                this.$router.push('/shop/myAddress')
             },
             billSetting() {
-                this.$router.replace('/shop/billSettings')
+                this.$router.push('/shop/billSettings/' + this.$route.query.serviceProId)
             },
             cancel() {},
             commit() {
@@ -158,6 +200,21 @@
             color #333333
         .value
             color #E65966
+    .invoice-con
+        background-color #ffffff
+        .title
+            height .8rem
+            padding 0 .2rem
+            border-bottom 1px solid #e7e7e7
+            font-size .26rem
+            line-height .8rem
+            color #333
+        .detail
+            width 100%
+            height 100%
+            display flex
+            align-items center
+            justify-content flex-end
     .posts-btn-con
         display flex
         justify-content space-around

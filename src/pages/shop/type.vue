@@ -11,23 +11,23 @@
 
         <div class="out-con">
             <div class="select-con" @click="changeActive">
-                <div class="select-item" @click="">精选推荐</div>
-                <div class="select-item active" @click="tabIndex = 1">服务分类</div>
-                <div class="select-item" @click="tabIndex = 2">精选推荐</div>
-                <div class="select-item" @click="">园区自营</div>
+                <div class="choose-item" @click="$router.push({path: `/shop/serviceList/001`, query: {mode: 'special'}})">精选服务</div>
+                <div class="select-item active" @click="tabIndex = 1">服务类型</div>
+                <div class="select-item" @click="tabIndex = 2">服务场景</div>
+                <div class="choose-item" @click="$router.push({path: `/shop/serviceList/002`, query: {mode: 'self'}})">园区自营</div>
             </div>
 
-            <div class="type-con" v-show="tabIndex === 1">
-                <router-link to="/shop/serviceList" class="type-item" v-for="n in 27" key="n">
-                    <img src="../../common/images/ic_money@3x.png" />
-                    <span>商标注册</span>
+            <div class="type-con" v-show="tabIndex === 1" >
+                <router-link v-for="(type, idx) in types" :to="{path: `/shop/serviceList/${type.id}`, query: {mode: 'type'}}" class="type-item" :key="idx">
+                    <img v-lazy="type.typeLogo" />
+                    <span>{{ type.name }}</span>
                 </router-link>
             </div>
 
             <div class="type-con" v-show="tabIndex === 2">
-                <router-link to="/shop/serviceList" class="type-item" v-for="n in 9" key="n">
-                    <img src="../../common/images/ic_law@3x.png" />
-                    <span>商标注册</span>
+                <router-link v-for="(stage, idx) in stages" :to="{path: `/shop/serviceList/${stage.serviceProId}`, query: {mode: 'stage'}}" class="type-item" :key="idx">
+                    <img v-lazy="stage.mainImage" />
+                    <span>{{ stage.mainTitle }}</span>
                 </router-link>
             </div>
         </div>
@@ -52,14 +52,29 @@
 </template>
 <script>
     import { TabBar, TabBarItem } from 'vue-ydui/dist/lib.rem/tabbar'
+    import { getServiceType, getStagesIcon } from '../../api/shopApi'
 
     export default {
         created() {
             document.title = this.$route.meta.title
+
+            getServiceType().then(response => {
+                if (response.body.code == 200) {
+                    this.types = response.body.data.items
+                }
+            })
+
+            getStagesIcon().then(response => {
+                if (response.body.code == 200) {
+                    this.stages = response.body.data
+                }
+            })
         },
         data() {
             return {
-                tabIndex: 1
+                tabIndex: 1,
+                types: null,
+                stages: null
             }
         },
         components: {
@@ -68,6 +83,11 @@
         },
         methods: {
             changeActive(e) {
+                if (e.target.className === 'choose-item') {
+
+                    return
+                }
+
                 let tabList = e.target.parentNode.getElementsByClassName('select-item')
                 for (let i = 0; i < tabList.length; i++) {
                     tabList[i].classList.remove('active')
@@ -116,6 +136,14 @@
                 &.active
                     color #00a7a3
                     background-color #f5f4f9
+            .choose-item
+                height .8rem
+                line-height .8rem
+                text-align center
+                font-size .26rem
+                &.active
+                    color #00a7a3
+                    background-color #f5f4f9
         .type-con
             float right
             width 5.4rem
@@ -135,6 +163,7 @@
                 img
                     width 1rem
                     height 1rem
+                    object-fit cover
                 span
                     font-size .26rem
                     color #999

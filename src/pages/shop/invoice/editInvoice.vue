@@ -6,10 +6,9 @@
                 <yd-input
                     slot="right"
                     required
-                    v-model="info.name1"
+                    v-model="info.enterpriseName"
                     placeholder="请输入企业名称"
                     ref="input0"
-                    :showSuccessIcon="false"
                 ></yd-input>
             </yd-cell-item>
             <yd-cell-item>
@@ -17,10 +16,9 @@
                 <yd-input
                     slot="right"
                     required
-                    v-model="info.name2"
+                    v-model="info.taxNo"
                     placeholder="请输入税号"
                     ref="input1"
-                    :showSuccessIcon="false"
                 ></yd-input>
             </yd-cell-item>
             <yd-cell-item>
@@ -28,10 +26,9 @@
                 <yd-input
                     slot="right"
                     required
-                    v-model="info.name3"
+                    v-model="info.address"
                     placeholder="请输入单位地址"
                     ref="input2"
-                    :showSuccessIcon="false"
                 ></yd-input>
             </yd-cell-item>
             <yd-cell-item>
@@ -40,10 +37,9 @@
                     slot="right"
                     type="number"
                     required
-                    v-model="info.name4"
+                    v-model="info.tel"
                     placeholder="请输入电话号码"
                     ref="input3"
-                    :showSuccessIcon="false"
                 ></yd-input>
             </yd-cell-item>
             <yd-cell-item>
@@ -51,10 +47,9 @@
                 <yd-input
                     slot="right"
                     required
-                    v-model="info.name5"
+                    v-model="info.bankName"
                     placeholder="请输入开户银行"
                     ref="input4"
-                    :showSuccessIcon="false"
                 ></yd-input>
             </yd-cell-item>
             <yd-cell-item>
@@ -63,10 +58,9 @@
                     slot="right"
                     type="number"
                     required
-                    v-model="info.name6"
+                    v-model="info.account"
                     placeholder="请输入银行账号"
                     ref="input5"
-                    :showSuccessIcon="false"
                 ></yd-input>
             </yd-cell-item>
         </yd-cell-group>
@@ -79,19 +73,27 @@
     </div>
 </template>
 <script>
+    import { getInvoiceInfoSingle ,editInvoiceInfo } from '../../../api/shopApi'
+
     export default {
         created() {
             document.title = this.$route.meta.title
+            getInvoiceInfoSingle(this.$route.params.id).then(response => {
+                if (response.body.code == 200) {
+                    this.info = response.body.data
+                }
+            })
         },
         data() {
             return {
                 info: {
-                    name1: '上海金晶科技有限公司',
-                    name2: '24137r8136',
-                    name3: '上海市浦东新区张江高科华佗路2736号',
-                    name4: '0212837665',
-                    name5: '中国建设银行',
-                    name6: '6222029847337652398',
+                    enterpriseName: '',
+                    taxNo: '',
+                    address: '',
+                    tel: '',
+                    bankName: '',
+                    account: '',
+                    isDefault: false
                 }
             }
         },
@@ -108,6 +110,12 @@
                         return;
                     }
                 }
+
+                editInvoiceInfo(this.info, this.$route.params.id).then(response => {
+                    if (response.body.code == 200) {
+                        this.$router.go(-1)
+                    }
+                })
             }
         }
     }
