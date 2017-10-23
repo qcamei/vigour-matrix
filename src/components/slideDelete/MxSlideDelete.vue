@@ -8,7 +8,7 @@
             <slot></slot>
         </div>
         <div class="deleteIcon" :style="zIndex" @click.stop.prevent="deleteItem(itemId)">
-            <yd-icon name="delete" color="#e65"></yd-icon>
+            <yd-icon name="delete" color="#fff"></yd-icon>
         </div>
     </div>
 </template>
@@ -100,5 +100,6 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        background-color: #cd5c5c;
     }
 </style>

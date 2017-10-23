@@ -1,29 +1,35 @@
 <template>
-    <div id="myOrderDetail">
+    <div id="myOrderDetail" v-if="applyInfo">
         <!--订单状态-->
         <yd-cell-group style="margin-bottom: .2rem;">
             <yd-cell-item>
-                <span slot="left">订单号：1728374572</span>
-                <span slot="right"><span class="text-red">待支付</span></span>
+                <span slot="left">订单号：{{ applyInfo.applyOrderNo }}</span>
+                <span slot="right">
+                    <span class="text-red" v-if="applyInfo.applyOrderStatus === 'APPLYWAITALLOT'">待分配</span>
+                    <span class="text-red" v-if="applyInfo.applyOrderStatus === 'APPLYWAITASSESS'">待评估</span>
+                    <span class="text-red" v-if="applyInfo.applyOrderStatus === 'ALREADREPULS'">已拒绝</span>
+                    <span class="text-red" v-if="applyInfo.applyOrderStatus === 'APPLYWAITVERIFY'">待确认下单</span>
+                    <span class="text-red" v-if="applyInfo.applyOrderStatus === 'APPLYWAITEXECUTOR'">待执行</span>
+                    <span class="text-red" v-if="applyInfo.applyOrderStatus === 'APPLYWAITSERVICEVERIFY'">待服务确认</span>
+                    <span class="text-red" v-if="applyInfo.applyOrderStatus === 'APPLYWAITCOMMENT'">待评价</span>
+                    <span class="text-red" v-if="applyInfo.applyOrderStatus === 'APPLYFINISH'">已完成</span>
+                    <span class="text-red" v-if="applyInfo.applyOrderStatus === 'APPLYCANCEL'">已取消</span>
+                </span>
             </yd-cell-item>
             <yd-cell-item>
-                <span slot="left">订单日期：2016-10-24</span>
-                <span slot="right"><span class="text-red">¥ 12,000.00</span></span>
+                <span slot="left">订单日期：{{ applyInfo.createTime }}</span>
+                <span slot="right" v-if="applyInfo.price"><span class="text-red">¥ {{ applyInfo.price }}</span></span>
             </yd-cell-item>
         </yd-cell-group>
 
         <!--服务项目-->
         <div class="service-con">
             <div class="thumb">
-                <img src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3601388998,136244981&fm=27&gp=0.jpg" />
+                <img v-lazy="applyInfo.mainImage" />
             </div>
             <div class="content">
-                <span class="title">张江世纪花园排水修复工作张江世纪花园排水</span>
-                <span class="size-con">
-                    <span>规格一</span>
-                    <span>规格二</span>
-                </span>
-                <span class="text-red">¥ 12,000.00</span>
+                <span class="title">{{ applyInfo.mainTitle }}</span>
+                <span class="desc">{{ applyInfo.synopsis }}</span>
             </div>
         </div>
 
@@ -44,18 +50,23 @@
                 <span class="txt">申请详情</span>
             </div>
             <div class="content">
-                <span class="row">
-                    <span class="label">联系人</span>
-                    <span class="value">萨瓦迪卡</span>
-                </span>
-                <span class="row">
-                    <span class="label">联系电话</span>
-                    <span class="value">15800905624</span>
-                </span>
-                <span class="row">
-                    <span class="label">邮箱</span>
-                    <span class="value">chenshengcheng@kuaicto.com</span>
-                </span>
+                <template v-for="(item, idx) in applyInfo.applyContent">
+                    <span class="row" v-if="item.labelType !== 'FILE'">
+                        <span class="label">{{ item.name }}</span>
+                        <span class="value">{{ item.value }}</span>
+                    </span>
+
+                    <yd-cell-group v-if="item.labelType === 'FILE'">
+                        <yd-cell-item style="height: 1.6rem">
+                            <span slot="left" class="label-text">{{ item.name }}</span>
+                            <yd-lightbox slot="right" :num="1" class="upload-list">
+                                <div class="room-item">
+                                    <yd-lightbox-img class="room-image" v-lazy="item.value"></yd-lightbox-img>
+                                </div>
+                            </yd-lightbox>
+                        </yd-cell-item>
+                    </yd-cell-group>
+                </template>
             </div>
         </div>
 
@@ -88,20 +99,26 @@
         </div>
 
         <!--服务评价-->
-        <div class="service-rattings">
+        <div class="service-rattings" v-if="applyInfo.applyOrderStatus === 'APPLYWAITCOMMENT' || applyInfo.applyOrderStatus === 'APPLYFINISH'">
             <div class="title">
                 <span class="txt">服务评价</span>
-                <yd-rate size="22px" activeColor="#ee8f2b" padding=".2rem" v-model="ratting"></yd-rate>
+                <yd-rate
+                    size="22px"
+                    activeColor="#ee8f2b"
+                    padding=".2rem"
+                    v-model="applyInfo.gradeNum ? applyInfo.gradeNum : ratting"
+                    :readonly="applyInfo.applyOrderStatus === 'APPLYFINISH'"
+                ></yd-rate>
             </div>
             <div class="content">
-                <textarea rows="4" placeholder="请输入评价"></textarea>
+                <textarea rows="4" placeholder="请输入评价" ref="textarea"></textarea>
             </div>
         </div>
 
         <!--底部按钮区-->
         <!--待确认申请-->
         <div class="posts-btn-con" v-if="false">
-            <yd-button @click.native="" class="posts-btn" type="hollow" bgcolor="#fff" color="#00A7A3"
+            <yd-button @click.native="cancelApplyPut" class="posts-btn" type="hollow" bgcolor="#fff" color="#00A7A3"
                        style="border: 1px solid #e7e7e7">取消申请
             </yd-button>
             <yd-button @click.native="" class="posts-btn" type="primary" bgcolor="#00A7A3" color="#fff">申请确认
@@ -109,37 +126,90 @@
         </div>
 
         <!--待服务确认-->
-        <div class="posts-btn-con" v-if="false">
+        <div class="posts-btn-con" v-if="applyInfo.applyOrderStatus === 'APPLYWAITSERVICEVERIFY'">
             <yd-button @click.native="" class="posts-btn" type="hollow" bgcolor="#fff" color="#00A7A3"
                        style="border: 1px solid #e7e7e7">联系客服
             </yd-button>
-            <yd-button @click.native="" class="posts-btn" type="primary" bgcolor="#00A7A3" color="#fff">服务确认
+            <yd-button @click.native="serviceConfirm" class="posts-btn" type="primary" bgcolor="#00A7A3" color="#fff">服务确认
             </yd-button>
         </div>
 
         <!--已完成 进行评价-->
-        <div class="posts-btn-con" v-if="true">
-            <yd-button @click.native="" class="posts-btn" type="primary" bgcolor="#00A7A3" color="#fff" style="width: 100%">提交评价
+        <div class="posts-btn-con" v-if="applyInfo.applyOrderStatus === 'APPLYWAITCOMMENT'">
+            <yd-button @click.native="commitCommentPost" class="posts-btn" type="primary" bgcolor="#00A7A3" color="#fff" style="width: 100%">提交评价
             </yd-button>
         </div>
     </div>
 </template>
 <script>
     import { Rate } from 'vue-ydui/dist/lib.rem/rate'
+    import { getApplyDetail, applyServiceConfirm, commitComment, cancelApply } from '../../../api/shopApi'
+    import { LightBox, LightBoxImg, LightBoxTxt } from 'vue-ydui/dist/lib.rem/lightbox';
 
     export default {
         created() {
             document.title = this.$route.meta.title
+            getApplyDetail(this.$route.params.id).then(response => {
+                if (response.body.code == 200) {
+                    this.applyInfo = response.body.data
+                }
+            })
         },
         data() {
             return {
+                applyInfo: null,
                 ratting: 0
             }
         },
         components: {
-            [Rate.name]: Rate
+            [Rate.name]: Rate,
+            [LightBox.name]: LightBox,
+            [LightBoxImg.name]: LightBoxImg,
+            [LightBoxTxt.name]: LightBoxTxt
         },
-        methods: {}
+        methods: {
+            cancelApplyPut() {
+                cancelApply(this.$route.params.id).then(response => {
+                    if (response.body.code == 200) {
+                        this.$dialog.toast({
+                            mes: '取消成功',
+                            timeout: 500,
+                            icon: 'success',
+                            callback: this.$router.go(-1)
+                        })
+                    }
+                })
+            },
+            serviceConfirm() {
+                applyServiceConfirm(this.$route.params.id).then(response => {
+                    if (response.body.code == 200) {
+                        this.$dialog.toast({
+                            mes: '确认成功',
+                            timeout: 500,
+                            icon: 'success',
+                            callback: this.$router.go(-1)
+                        })
+                    }
+                })
+            },
+            commitCommentPost() {
+                let postInfo = {
+                    applyOrderId: this.applyInfo.applyOrderId,
+                    commentText: this.$refs.textarea.value,
+                    gradeNum: this.ratting
+                }
+                commitComment(postInfo).then(response => {
+                    if (response.body.code == 200) {
+                        this.$dialog.toast({
+                            mes: '评价成功',
+                            timeout: 500,
+                            icon: 'success',
+                            callback: this.$router.go(-1)
+                        })
+                    }
+                })
+            }
+        }
     }
 </script>
 <style scoped lang="stylus" rel="stylesheet/stylus">
@@ -166,19 +236,24 @@
         .content
             display flex
             flex-direction column
-            justify-content space-around
+            justify-content space-between
             height 1.2rem
             margin-left .2rem
+            width calc(100% - 1.4rem)
             .title
                 text-overflow ellipsis
                 overflow hidden
                 white-space nowrap
                 width 5.48rem
                 color #333
-            .size-con
-                color #333
-                span
-                    margin-right 0 .2rem
+            .desc
+                font-size .24rem
+                color #999
+                line-height 1.4
+                display -webkit-box
+                -webkit-line-clamp 2
+                -webkit-box-orient vertical
+                overflow hidden
     .comment-info
         position relative
         background-color #fff
@@ -271,7 +346,7 @@
                 width 100%
                 height 1rem
                 font-size .26rem
-                padding 0 .2rem 0 .4rem
+                padding 0 .2rem 0 .2rem
                 border-top 1px solid #e7e7e7
                 .label
                     font-size .24rem
@@ -279,6 +354,25 @@
                 .value
                     font-size .24rem
                     color #666
+            .image-con
+                width 6rem
+            .upload-list
+                display flex
+                justify-content flex-start
+                .room-item
+                    display flex
+                    justify-content flex-end
+                    position relative
+                    border-radius 2px
+                    overflow hidden
+                    width 33vw
+                .room-image
+                    width 1.2rem
+                    height 1.2rem
+                    border none
+                    border-radius 2px
+                    object-fit cover
+                    background-color #f3f4f5
     .posts-btn-con
         display flex
         justify-content space-around

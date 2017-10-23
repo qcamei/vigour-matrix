@@ -108,7 +108,7 @@
 
                 addInvoiceInfo(this.info).then(response => {
                     if (response.body.code == 200) {
-                        this.$router.replace('/shop/invoice')
+                        this.$router.go(-1)
                     }
                 })
             }

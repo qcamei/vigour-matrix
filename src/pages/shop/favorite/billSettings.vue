@@ -3,7 +3,8 @@
         <yd-cell-group style="margin-bottom: .2rem">
             <yd-cell-item arrow>
                 <span slot="left">发票抬头</span>
-                <span slot="right">企业</span>
+                <span slot="right" v-if="this.items && this.items.length">企业</span>
+                <span slot="right" v-if="!this.items">个人</span>
             </yd-cell-item>
         </yd-cell-group>
 
@@ -48,10 +49,13 @@
         components: {},
         methods: {
             makeSure() {
-                var flag = this.items.find(item => item.isDefault)
-                if (!flag) return
+                var billItem = this.items.find(item => item.isDefault)
+                if (!billItem) {
+                    sessionStorage.setItem('invoiceType', '个人')
+                    return this.$router.go(-1)
+                }
 
-                sessionStorage.setItem('invoice_' + this.$route.params.id, flag.id)
+                sessionStorage.setItem('invoice_' + this.$route.params.id, billItem.id)
                 this.$router.go(-1)
             },
             changeChecked(item) {

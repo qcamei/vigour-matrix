@@ -158,13 +158,19 @@
                 justify-content space-between
                 float left
                 width 33.333%
-                height 1.48rem
-                margin-bottom .32rem
+                margin-bottom .25rem
                 img
                     width 1rem
                     height 1rem
                     object-fit cover
                 span
-                    font-size .26rem
+                    font-size .2rem
                     color #999
+                    width 1rem
+                    height .44rem
+                    margin-top .2rem
+                    display -webkit-box
+                    -webkit-line-clamp 2
+                    -webkit-box-orient vertical
+                    overflow hidden
 </style>

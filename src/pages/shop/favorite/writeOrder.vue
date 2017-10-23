@@ -41,7 +41,7 @@
         <div class="invoice-con" style="margin-bottom: .2rem" v-if="invoiceInfo">
             <div class="title">发票</div>
             <yd-cell-group>
-                <yd-cell-item arrow @click.native="">
+                <yd-cell-item arrow @click.native="billSetting">
                     <span slot="left">{{ invoiceInfo.enterpriseName }}</span>
                 </yd-cell-item>
                 <yd-cell-item arrow>
@@ -64,7 +64,8 @@
     import {
         getMyAddress,
         getServiceDetail,
-        getInvoiceInfo
+        getInvoiceInfo,
+        postOrder
     } from '../../../api/shopApi'
     export default {
         created() {
@@ -83,19 +84,30 @@
             })
 
             let invoiceId = sessionStorage.getItem('invoice_' + this.$route.query.serviceProId)
+            let invoiceType = sessionStorage.getItem('invoiceType')
+
             if (invoiceId) {
+                this.invoiceType = 'ENTERPRISE'
                 getInvoiceInfo().then(response => {
                     if (response.body.code == 200) {
-                        this.invoiceInfo = response.body.data.items.find(item => item.id = invoiceId)
+                        this.invoiceInfo = response.body.data.items.find(item => item.isDefault)
+                        setInterval(() => {
+                            sessionStorage.setItem('invoice_' + this.$route.query.serviceProId, '')
+                        }, 100)
                     }
                 })
+            }
+
+            if (invoiceType === '个人' && !invoiceId) {
+                this.invoiceType = 'INDIVIDUAL'
             }
         },
         data() {
             return {
                 defaultAddress: null,
                 servicePro: null,
-                invoiceInfo: null
+                invoiceInfo: null,
+                invoiceType: null
             }
         },
         components: {
@@ -107,9 +119,28 @@
             billSetting() {
                 this.$router.push('/shop/billSettings/' + this.$route.query.serviceProId)
             },
-            cancel() {},
+            cancel() {
+                this.$router.go(-1)
+            },
             commit() {
-                this.$router.push('/shop/pay')
+                let postInfo = {
+                    serviceProId: Number(this.$route.query.serviceProId),
+                    orderMemo: this.$refs.textarea.$el.firstChild.value,
+                    specificationId: Number(this.$route.query.specificationId),
+                    tempPrice: this.$route.query.tempPrice,
+                    addressId: this.defaultAddress.id,
+                    invoiceType: this.invoiceType,
+                }
+
+                this.invoiceType === 'ENTERPRISE' ? postInfo.invoiceId = this.invoiceInfo.id : void 0
+
+                postOrder(postInfo).then(response => {
+                    if (response.body.code == 200) {
+                        console.log(response.body)
+                        this.$router.push('/shop/pay')
+                    }
+                })
+
             },
         }
     }

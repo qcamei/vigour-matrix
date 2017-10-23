@@ -17,12 +17,12 @@
         </div>
 
         <!--商城活动-->
-        <div class="service-item" v-if="shopActivities">
+        <div class="service-item" v-if="shopActivities" data-type="activities">
             <div class="img-con">
                 <img v-lazy="shopActivities.imageUrl" />
             </div>
             <div class="sub-con">
-                <router-link to="#" v-for="(activity, idx) in shopActivities.activityItems" :key="idx" class="sub-item">
+                <router-link :to="`/shop/serviceDetail/${activity.serviceProId}/imageText`" v-for="(activity, idx) in shopActivities.activityItems" :key="idx" class="sub-item">
                     <div class="thumb-con">
                         <img v-lazy="activity.serviceProjectMap.mainImage" />
                     </div>
@@ -35,12 +35,12 @@
         </div>
 
         <!--精选服务-->
-        <div class="service-item" v-if="specials">
+        <div class="service-item" v-if="specials" data-type="special">
             <div class="img-con">
                 <img v-lazy="specials.imageUrl" />
             </div>
             <div class="sub-con">
-                <router-link to="#" v-for="(special, idx) in specials.siftItems" :key="idx" class="sub-item">
+                <router-link :to="`/shop/serviceDetail/${special.serviceProId}/imageText`" v-for="(special, idx) in specials.siftItems" :key="idx" class="sub-item">
                     <div class="thumb-con">
                         <img v-lazy="special.serviceProjectMap.mainImage" />
                     </div>
@@ -53,45 +53,58 @@
         </div>
 
         <!--服务类型-->
-        <div class="service-item" v-if="serviceTypes">
+        <div class="service-item" v-if="serviceTypes" v-for="(type, idx) in serviceTypes" :key="idx" data-type="types">
+            <div class="img-con">
+                <img v-lazy="type.recoLogo" />
+            </div>
             <div class="sub-con">
-                <router-link :to="{path: `/shop/serviceList/${serviceTypes[idx].id}`, query: {mode: 'type'}}" v-for="(serviceType, idx) in serviceTypes" :key="idx" class="sub-item">
+                <router-link
+                    :to="`/shop/serviceDetail/${serviceType.serviceProId}/imageText`"
+                    v-for="(serviceType, index) in type.serviceProList"
+                    :key="index"
+                    class="sub-item"
+                >
                     <div class="thumb-con">
-                        <img v-lazy="serviceType.typeLogo" />
+                        <img v-lazy="serviceType.mainImage" />
                     </div>
                     <div class="text">
-                        <span class="title">{{ serviceType.name }}</span>
-                        <span class="desc">{{ serviceType.describle }}</span>
+                        <span class="title">{{ serviceType.mainTitle }}</span>
+                        <span class="desc">{{ serviceType.synopsis }}</span>
                     </div>
                 </router-link>
             </div>
         </div>
 
         <!--服务场景-->
-        <div class="service-item" v-if="stages">
-            <div class="img-con" v-if="false">
-                <img src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=3340904242,373088440&fm=200&gp=0.jpg" />
+        <div class="service-item" v-if="stages" v-for="(preStage, index) in stages" :key="index" data-type="stages">
+            <div class="img-con">
+                <img v-lazy="preStage.recoLogo" />
             </div>
             <div class="sub-con">
-                <router-link :to="{path: `/shop/serviceList/${stages[idx].id}`, query: {mode: 'stage'}}" v-for="(stage, idx) in stages" :key="idx" class="sub-item">
+                <router-link
+                    :to="`/shop/serviceDetail/${stage.serviceProId}/imageText`"
+                    v-for="(stage, idx) in preStage.serviceProList"
+                    :key="idx"
+                    class="sub-item"
+                >
                     <div class="thumb-con">
-                        <img v-lazy="stage.scaneLogo" />
+                        <img v-lazy="stage.mainImage" />
                     </div>
                     <div class="text">
-                        <span class="title">{{ stage.name }}</span>
-                        <span class="desc">{{ stage.describle }}</span>
+                        <span class="title">{{ stage.mainTitle }}</span>
+                        <span class="desc">{{ stage.synopsis }}</span>
                     </div>
                 </router-link>
             </div>
         </div>
 
         <!--园区自营-->
-        <div class="service-item" v-if="parkSelf">
-            <div class="img-con" v-if="false">
+        <div class="service-item" v-if="parkSelf" data-type="parkSelf">
+            <div class="img-con">
                 <img src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=3340904242,373088440&fm=200&gp=0.jpg" />
             </div>
             <div class="sub-con">
-                <router-link :to="{path: `/shop/serviceList/${parkSelf[idx].serviceProId}`, query: {mode: 'self'}}" v-for="(self, idx) in parkSelf" :key="idx" class="sub-item">
+                <router-link :to="{path: `/shop/serviceDetail/${parkSelf[idx].serviceProId}/imageText`}" v-for="(self, idx) in parkSelf" :key="idx" class="sub-item">
                     <div class="thumb-con">
                         <img v-lazy="self.mainImage" />
                     </div>

@@ -1,59 +1,79 @@
 <template>
-    <div id="myOrderDetail">
+    <div id="myOrderDetail" v-if="orderInfo">
         <!--订单状态-->
-        <yd-cell-group style="margin-bottom: .2rem;">
+        <yd-cell-group style="margin-bottom: .2rem;" >
             <yd-cell-item>
-                <span slot="left">订单号：1728374572</span>
-                <span slot="right"><span class="text-red">待支付</span></span>
+                <span slot="left">订单号：{{ orderInfo.applyOrderNo }}</span>
+                <span slot="right">
+                    <span class="text-red" v-if="orderInfo.applyOrderStatus === 'WAITPAY'">待支付</span>
+                    <span class="text-red" v-if="orderInfo.applyOrderStatus === 'ORDERWAITALLOT'">待分配</span>
+                    <span class="text-red" v-if="orderInfo.applyOrderStatus === 'ORDERWAITEXECUTOR'">待处理</span>
+                    <span class="text-red" v-if="orderInfo.applyOrderStatus === 'ORDERCANCEL'">已取消</span>
+                    <span class="text-red" v-if="orderInfo.applyOrderStatus === 'ORDERWAITVERIFY'">待确认</span>
+                    <span class="text-red" v-if="orderInfo.applyOrderStatus === 'ORDERWAITCOMMENT'">待评价</span>
+                    <span class="text-red" v-if="orderInfo.applyOrderStatus === 'ORDERFINISH'">已完成</span>
+                    <span class="text-red" v-if="orderInfo.applyOrderStatus === 'ORDERTERMINATION'">已关闭</span>
+                </span>
             </yd-cell-item>
             <yd-cell-item>
-                <span slot="left">订单日期：2016-10-24</span>
-                <span slot="right"><span class="text-red">¥ 12,000.00</span></span>
+                <span slot="left">订单日期：{{ orderInfo.createTime }}</span>
+                <span slot="right"><span class="text-red">¥ {{ orderInfo.price }}</span></span>
             </yd-cell-item>
         </yd-cell-group>
 
         <!--服务项目-->
-        <div class="service-con">
+        <div class="service-con" >
             <div class="thumb">
-                <img src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3601388998,136244981&fm=27&gp=0.jpg" />
+                <img v-lazy="orderInfo.mainImage" />
             </div>
             <div class="content">
-                <span class="title">张江世纪花园排水修复工作张江世纪花园排水</span>
-                <span class="size-con">
-                    <span>规格一</span>
-                    <span>规格二</span>
+                <span class="title">{{ orderInfo.mainTitle }}</span>
+                <span class="size-con" v-if="orderInfo.specification && orderInfo.specification.configs">
+                    <span
+                        v-for="(item, idx) in orderInfo.specification.configs"
+                        :key="idx"
+                        style="margin-right: .2rem"
+                    >{{ item.itemValue }}</span>
                 </span>
-                <span class="text-red">¥ 12,000.00</span>
+                <span class="text-red">¥ {{ orderInfo.price }}</span>
             </div>
         </div>
 
         <!--订单备注-->
-        <yd-cell-group style="margin-bottom: .2rem">
+        <yd-cell-group style="margin-bottom: .2rem" >
             <yd-cell-item>
                 <span slot="left">订单备注</span>
-                <span slot="right"><input type="text" value="暂无信息" style="text-align: right"></span>
+                <span slot="right" style="width: 100%">
+                    <input
+                        type="text"
+                        value="暂无信息"
+                        style="text-align: right; width: 100%; padding-left: .2rem"
+                        v-model="orderInfo.orderMemo" />
+                </span>
             </yd-cell-item>
         </yd-cell-group>
 
         <!--收货信息-->
-        <div class="save-info">
+        <div class="save-info" >
             <span class="title">收货信息</span>
-            <span class="content">
-                <span>张三 13678789990</span>
+            <span class="content" v-if="orderInfo.address">
+                <span>{{ orderInfo.address.contacts }} {{ orderInfo.address.phone }}</span>
                 <br>
-                <span>上海市虹口区曲阳路800号曲阳商务中心2701</span>
+                <span>
+                    {{ orderInfo.address.proviceName }}
+                    {{ orderInfo.address.cityName }}
+                    {{ orderInfo.address.countyName }}
+                    {{ orderInfo.address.addr }}
+                </span>
             </span>
         </div>
 
         <!--发票信息-->
-        <div class="bill-info yd-cell">
+        <div class="bill-info yd-cell" v-if="orderInfo && orderInfo.invoice">
             <div class="yd-cell-item">
                 <div class="yd-cell-left"><span>发票信息</span></div>
                 <div class="yd-cell-right">
-                    <span>企业</span>
-                    <span>电子发票</span>
-                    <span>服务类</span>
-                    <span>13878789990</span>
+                    <span>{{ orderInfo.invoice.enterpriseName }}</span>
                 </div>
             </div>
             <img class="edit-icon" src="../../../common/images/ic_edit@3x.png" />
@@ -88,58 +108,131 @@
         </div>
 
         <!--服务评价-->
-        <div class="service-rattings">
+        <div
+            class="service-rattings"
+            v-if="orderInfo.applyOrderStatus === 'ORDERWAITCOMMENT' || orderInfo.applyOrderStatus === 'ORDERFINISH'">
             <div class="title">
                 <span class="txt">服务评价</span>
-                <yd-rate size="22px" activeColor="#ee8f2b" padding=".2rem" v-model="ratting"></yd-rate>
+                <yd-rate
+                    size="22px"
+                    activeColor="#ee8f2b"
+                    padding=".2rem"
+                    v-model="orderInfo.gradeNum ? orderInfo.gradeNum : ratting"
+                    :readonly="orderInfo.applyOrderStatus === 'ORDERFINISH'"
+                ></yd-rate>
             </div>
             <div class="content">
-                <textarea rows="4" placeholder="请输入评价"></textarea>
+                <textarea rows="4" placeholder="请输入评价" ref="textarea"></textarea>
             </div>
         </div>
 
         <!--底部按钮区-->
         <!--待支付-->
-        <div class="posts-btn-con" v-if="false">
-            <yd-button @click.native="" class="posts-btn" type="hollow" bgcolor="#fff" color="#00A7A3"
-                       style="border: 1px solid #e7e7e7">取消订单
+        <div class="posts-btn-con" v-if="orderInfo.applyOrderStatus === 'WAITPAY'">
+            <yd-button @click.native="cancelOrderPut" class="posts-btn" type="hollow" bgcolor="#fff" color="#00A7A3" style="border: 1px solid #e7e7e7">取消订单
             </yd-button>
-            <yd-button @click.native="" class="posts-btn" type="primary" bgcolor="#00A7A3" color="#fff">去支付
+            <yd-button @click.native="goToPay" class="posts-btn" type="primary" bgcolor="#00A7A3" color="#fff">去支付
             </yd-button>
         </div>
 
         <!--待确认-->
-        <div class="posts-btn-con" v-if="false">
-            <yd-button @click.native="" class="posts-btn" type="hollow" bgcolor="#fff" color="#00A7A3"
-                       style="border: 1px solid #e7e7e7">联系客服
+        <div class="posts-btn-con" v-if="orderInfo.applyOrderStatus === 'ORDERWAITVERIFY'">
+            <yd-button @click.native="" class="posts-btn" type="hollow" bgcolor="#fff" color="#00A7A3" style="border: 1px solid #e7e7e7">联系客服
             </yd-button>
-            <yd-button @click.native="" class="posts-btn" type="primary" bgcolor="#00A7A3" color="#fff">订单确认
+            <yd-button @click.native="confirmOrderPut" class="posts-btn" type="primary" bgcolor="#00A7A3" color="#fff">订单确认
             </yd-button>
         </div>
 
-        <!--已完成 进行评价-->
-        <div class="posts-btn-con">
-            <yd-button @click.native="" class="posts-btn" type="primary" bgcolor="#00A7A3" color="#fff" style="width: 100%">提交评价
+        <!--待评价-->
+        <div class="posts-btn-con" v-if="orderInfo.applyOrderStatus === 'ORDERWAITCOMMENT'">
+            <yd-button @click.native="commitCommentPost" class="posts-btn" type="primary" bgcolor="#00A7A3" color="#fff" style="width: 100%">提交评价
             </yd-button>
         </div>
     </div>
 </template>
 <script>
     import { Rate } from 'vue-ydui/dist/lib.rem/rate'
+    import {
+        getOrderdetail,
+        cancelOrder,
+        confirmOrder,
+        commitComment
+    } from '../../../api/shopApi'
 
     export default {
         created() {
             document.title = this.$route.meta.title
+            getOrderdetail(this.$route.params.id).then(response => {
+                if (response.body.code == 200) {
+                    this.orderInfo = response.body.data
+                }
+            })
         },
         data() {
             return {
+                orderInfo: null,
                 ratting: 0
             }
         },
         components: {
             [Rate.name]: Rate
         },
-        methods: {}
+        methods: {
+            // 去支付
+            goToPay() {
+                this.$router.push({
+                    path: '/shop/pay',
+                    query: {
+                        orderNo: this.orderInfo.applyOrderNo,
+                        orderId: this.orderInfo.applyOrderId
+                    }
+                })
+            },
+            // 取消订单
+            cancelOrderPut() {
+                cancelOrder(this.orderInfo.applyOrderId).then(response => {
+                    if (response.body.code == 200) {
+                        this.$dialog.toast({
+                            mes: '取消成功',
+                            timeout: 500,
+                            icon: 'success',
+                            callback: this.$router.go(-1)
+                        })
+                    }
+                })
+            },
+            // 确认订单
+            confirmOrderPut() {
+                confirmOrder(this.orderInfo.applyOrderId).then(response => {
+                    if (response.body.code == 200) {
+                        this.$dialog.toast({
+                            mes: '确认成功',
+                            timeout: 500,
+                            icon: 'success',
+                            callback: this.$router.go(-1)
+                        })
+                    }
+                })
+            },
+            // 提交评价
+            commitCommentPost() {
+                let postInfo = {
+                    applyOrderId: this.orderInfo.applyOrderId,
+                    commentText: this.$refs.textarea.value,
+                    gradeNum: this.ratting
+                }
+                commitComment(postInfo).then(response => {
+                    if (response.body.code == 200) {
+                        this.$dialog.toast({
+                            mes: '评价成功',
+                            timeout: 500,
+                            icon: 'success',
+                            callback: this.$router.go(-1)
+                        })
+                    }
+                })
+            }
+        }
     }
 </script>
 <style scoped lang="stylus" rel="stylesheet/stylus">
@@ -166,7 +259,7 @@
         .content
             display flex
             flex-direction column
-            justify-content space-around
+            justify-content space-between
             height 1.2rem
             margin-left .2rem
             .title

@@ -26,6 +26,10 @@
                 type: String,
                 required: true
             },
+            selectId: {
+                type: Number,
+                required: true
+            },
             chooseList: {
                 type: Array,
                 required: true
@@ -39,10 +43,10 @@
             callback() {
                 return this.chooseList.map(item => (
                         {
-                            label: item.label,
+                            label: item.name,
                             method: select => {
                                 this.selectValue = select.label
-                                this.$emit('selectEnd', this.selectValue)
+                                this.$emit('selectEnd', this.selectValue, this.selectId)
                             }
                         }
                     )

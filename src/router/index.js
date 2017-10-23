@@ -382,17 +382,17 @@ export default new Router({
                     ]
                 },
                 {
-                    path: 'myorderDetail',
+                    path: 'myorderDetail/:id',
                     component: MyorderDetail,
                     meta: {
                         title: '订单详情'
                     }
                 },
                 {
-                    path: 'myapplyDetail',
+                    path: 'myapplyDetail/:id',
                     component: MyapplyDetail,
                     meta: {
-                        title: '订单详情'
+                        title: '申请单详情'
                     }
                 },
                 {
@@ -482,7 +482,7 @@ export default new Router({
                     }
                 },
                 {
-                    path: 'writeApply',
+                    path: 'writeApply/:id',
                     component: WriteApply,
                     meta: {
                         title: '填写申请'

@@ -1,85 +1,81 @@
 <template>
     <div id="writeApply" style="padding-bottom: 1.2rem">
         <!--服务单信息-->
-        <div class="service-con">
+        <div class="service-con" v-if="serviceInfo">
             <div class="thumb">
-                <img src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3601388998,136244981&fm=27&gp=0.jpg" />
+                <img v-if="serviceInfo.mainImage.length" v-lazy="serviceInfo.mainImage[0].path"/>
             </div>
             <div class="content">
-                <span class="title">张江世纪花园排水修复工作张江世纪花园排水</span>
-                <span class="text-red">¥ 12,000.00</span>
+                <span class="title">{{ serviceInfo.mainTitle }}</span>
+                <span class="desc">{{ serviceInfo.subTitle }}</span>
             </div>
         </div>
 
         <div class="total-price">
-            <span class="label">订单总金额</span>
-            <span class="value">待评估</span>
+            <span class="label"></span>
+            <span class="value">待申请</span>
         </div>
 
         <div class="custom-con">
             <div class="title">服务申请</div>
 
-            <!--文本输入-->
-            <yd-cell-group>
-                <yd-cell-item>
-                    <span slot="left">联系人</span>
-                    <yd-input
-                        slot="right"
-                        required
-                        v-model="info.name"
-                        placeholder="请输入联系人姓名"
-                    ></yd-input>
-                </yd-cell-item>
-            </yd-cell-group>
+            <template v-for="(tpl, idx) in templates">
+                <!--文本输入-->
+                <yd-cell-group v-if="tpl.labelType === 'TEXT'" :key="idx">
+                    <yd-cell-item>
+                        <span slot="left">{{ tpl.name }}</span>
+                        <yd-input
+                            slot="right"
+                            :required="!!tpl.isRequire"
+                            v-model="tpl.value"
+                            :placeholder="tpl.labelHint"
+                            :show-success-icon="false"
+                        ></yd-input>
+                    </yd-cell-item>
+                </yd-cell-group>
 
-            <!--数字-->
-            <yd-cell-group>
-                <yd-cell-item>
-                    <span slot="left">联系方式</span>
-                    <yd-input
-                        slot="right"
-                        required
-                        type="number"
-                        v-model="info.cellphone"
-                        placeholder="请输入电话号码"
-                    ></yd-input>
-                </yd-cell-item>
-            </yd-cell-group>
+                <!--数字-->
+                <yd-cell-group v-if="tpl.labelType === 'NUM'" :key="idx">
+                    <yd-cell-item>
+                        <span slot="left">{{ tpl.name }}</span>
+                        <yd-input
+                            slot="right"
+                            :required="!!tpl.isRequire"
+                            type="number"
+                            v-model="tpl.value"
+                            :placeholder="tpl.labelHint"
+                            :show-success-icon="false"
+                        ></yd-input>
+                    </yd-cell-item>
+                </yd-cell-group>
 
-            <!--文本-->
-            <yd-cell-group>
-                <yd-cell-item>
-                    <span slot="left">企业名称</span>
-                    <yd-input
-                        slot="right"
-                        required
-                        v-model="info.companyName"
-                        placeholder="请输入企业名称"
-                    ></yd-input>
-                </yd-cell-item>
-            </yd-cell-group>
+                <!--单选-->
+                <mx-select
+                    :key="idx"
+                    v-if="tpl.labelType === 'SELECT'"
+                    :label="tpl.name"
+                    :chooseList="tpl.templateLabelItems"
+                    :selectId="tpl.id"
+                    defaultValue="请选择"
+                    @selectEnd="selectEnd"
+                ></mx-select>
+            </template>
 
-            <!--单选-->
-            <mx-select
-                label="企业类型"
-                :chooseList="[{label: 'OTO'}, {label: 'P2P'}]"
-                defaultValue="请选择"
-                @selectEnd="selectEnd"
-            ></mx-select>
-
-            <!--textarea-->
-            <div class="text-content">
-                <textarea rows="4" placeholder="请输入文本内容">{{ info.textarea }}</textarea>
-            </div>
-
-            <!--图片-->
+            <template>
+                <!--图片-->
                 <mx-uploader
-                    v-for="(item, idx) in imageArr"
+                    v-if="imageTpls[idx].labelType === 'FILE'"
+                    v-for="(item, idx) in imageTpls"
                     :key="idx"
                     :title="item.title"
-                    :files="imageArr[idx].files"
-                    :deelFiles="imageArr[idx].deelFiles"
+                    :files="imageTpls[idx].files"
+                    :deelFiles="imageTpls[idx].deelFiles"
+                    :imageApi="'/platform/image'"
+                    @uploadend="uploadEndCb"
+                    :ref="item.id"
+                    :fileId="item.id"
                 ></mx-uploader>
+            </template>
         </div>
 
         <!--按钮区-->
@@ -95,32 +91,54 @@
 <script>
     import MxSelect from '../../../components/select/MxSelect.vue'
     import MxUploader from '../../../components/uploader/MxUploader.vue'
+    import {
+        getServiceDetail,
+        getApplyTemplate,
+        postApplyTemplate
+    } from '../../../api/shopApi'
 
     export default {
         created() {
             document.title = this.$route.meta.title
+
+            getServiceDetail(this.$route.query.serviceProId).then(response => {
+                if (response.body.code == 200) {
+                    this.serviceInfo = response.body.data
+                }
+            })
+
+            getApplyTemplate(this.$route.params.id).then(response => {
+                if (response.body.code == 200) {
+                    this.templates = response.body.data.templateLabels
+                        .map(item => {
+                            return {
+                                ...item,
+                                value: ''
+                            }
+                        })
+                    this.imageTpls = response.body.data.templateLabels
+                        .filter(item => item.labelType == 'FILE')
+                        .map(cur => {
+                            return {
+                                ...cur,
+                                title: cur.name,
+                                files: [],
+                                deelFiles: []
+                            }
+                        })
+                    console.log(this.imageTpls)
+                }
+            })
         },
         data() {
             return {
-                info: {
-                    name: '',
-                    cellphone: '',
-                    companyName: '',
-                    companyType: '',
-                    textarea: ''
-                },
-                imageArr: [
-                    {
-                        title: '添加现场图片',
-                        files: [],
-                        deelFiles: [],
-                    },
-                    {
-                        title: '身份证图片',
-                        files: [],
-                        deelFiles: [],
-                    }
-                ]
+                serviceInfo: null,
+                templates: null,
+                chooseList: null,
+                imageTpls: null,
+                info: {},
+                imageSelectedAry: null,
+                countAry: []
             }
         },
         components: {
@@ -128,34 +146,78 @@
             MxUploader
         },
         methods: {
-            selectEnd(val) {
-                this.info.companyType = val
+            selectEnd(selectValue, selectId) {
+                this.templates.forEach(item => {
+                    if (item.id == selectId) {
+                        item.value = selectValue
+                    }
+                })
             },
             cancel() {
                 this.$router.go(-1)
             },
             commit() {
-//                for (let i = 0; i < 5; i++) {
-//                    var validFlag = this.$refs['input' + i].valid
-//                    if (!validFlag) {
-//                        this.$dialog.toast({
-//                            mes: this.$refs['input' + i].errorMsg,
-//                            timeout: 500
-//                        });
-//                        return;
-//                    }
-//                }
+                this.$dialog.loading.open('发送中')
 
-                // this.$dialog.loading.open('发送中')
-
-                if (this.files.length) {
-                    this.submit()
-
-                    this.$on('uploadend', function (data) {
-                        // 发送请求（有图片的情况下）
+                this.imageSelectedAry = []
+                this.imageTpls && this.imageTpls.forEach(item => {
+                    if (item.files.length) this.imageSelectedAry.push(item.id)
+                })
+                if (this.imageTpls && this.imageSelectedAry.length) {
+                    this.imageSelectedAry.forEach(id => {
+                        this.$refs[id][0].submit()
                     })
                 } else {
                     // 发送（无图片）
+                    let tempPostInfo = this.templates
+                    tempPostInfo.forEach(item => {
+                        delete item.applyTemplateId
+                        if (item.labelType == 'SELECT') {
+                            delete item.templateLabelItems
+                        }
+                    })
+
+                    let postInfo = {
+                        serviceProId: this.$route.query.serviceProId,
+                        applyLabelItems: tempPostInfo
+                    }
+                    postApplyTemplate(postInfo).then(response => {
+                        if (response.body.code == 200) {
+                            this.$dialog.loading.close()
+                            this.$router.replace('/shop/order/myapply')
+                        }
+                    })
+                }
+            },
+            uploadEndCb(data, id) {
+                this.countAry.push({id, data})
+                if (this.countAry.length === this.imageSelectedAry.length) {
+                    this.templates.forEach(item => {
+                        this.countAry.forEach(cur => {
+                            if (item.id == cur.id) {
+                                item.value = data[0]
+                            }
+                        })
+                    })
+
+                    let tempPostInfo = this.templates
+                    tempPostInfo.forEach(item => {
+                        delete item.applyTemplateId
+                        if (item.labelType == 'SELECT') {
+                            delete item.templateLabelItems
+                        }
+                    })
+
+                    let postInfo = {
+                        serviceProId: this.$route.query.serviceProId,
+                        applyLabelItems: tempPostInfo
+                    }
+                    postApplyTemplate(postInfo).then(response => {
+                        if (response.body.code == 200) {
+                            this.$dialog.loading.close()
+                            this.$router.replace('/shop/order/myapply')
+                        }
+                    })
                 }
             }
         }
@@ -165,6 +227,7 @@
     span
         color #262626
         font-size .26rem
+
     .service-con
         background-color #fff
         padding .2rem
@@ -192,6 +255,15 @@
                 color #333
             .text-red
                 color #E65966
+            .desc
+                width 5.48rem
+                color #999
+                line-height: 1.2
+                display: -webkit-box
+                -webkit-line-clamp: 3
+                -webkit-box-orient: vertical
+                overflow: hidden
+                margin-top .2rem
     .total-price
         background-color #ffffff
         border-bottom 1px solid #e7e7e7
@@ -205,6 +277,7 @@
             color #333333
         .value
             color #E65966
+
     .custom-con
         background-color #ffffff
         .title
@@ -222,6 +295,7 @@
                 outline none
                 font-size 0.26rem
                 padding 0.2rem
+
     .photo-tit
         font-size .3rem
         padding 0 .2rem
@@ -231,6 +305,7 @@
             color #333
         .text2
             color #3f3f3f
+
     .vue-uploader
         position: relative
         padding 0 .4rem .2rem
@@ -290,6 +365,7 @@
             font-size .8rem
         input[type="file"]
             display none
+
     .posts-btn-con
         display flex
         justify-content space-around

@@ -1,5 +1,5 @@
 <template>
-    <div style="height: 100%; padding-bottom: 1.2rem">
+    <div style="height: 100%; padding-bottom: 1.2rem" v-if="info">
         <yd-slider autoplay="3000" style="height: 3.8rem" v-if="info && info.listImage.length">
             <yd-slider-item v-for="(item, idx) in info.listImage" :key="idx">
                 <a href="#">
@@ -71,7 +71,7 @@
             getServiceDetail(this.$route.params.id).then(response => {
                 if (response.body.code == 200) {
                     var res = response.body.data
-                    res.orderTemplate.labels.forEach(item => {
+                    res.supportOrder && res.orderTemplate.labels.forEach(item => {
                         item.items.forEach(cur => {
                             cur.selected = false
                             cur.enabled = false
@@ -79,16 +79,18 @@
                     })
 
                     this.info = res
-                    this.orderLabels = res.orderTemplate.labels
-                    this.validMap = res.validMap
-                    this.validIds = res.validIds
-                    this.isFavorite = res.isCollect
+                    if (res.supportOrder) {
+                        this.orderLabels = res.orderTemplate.labels
+                        this.validMap = res.validMap
+                        this.validIds = res.validIds
 
-                    this.orderLabels[0].items.forEach(item => {
-                        this.validIds.forEach(cur => {
-                            cur == item.id ? item.enabled = true : false
+                        this.orderLabels[0].items.forEach(item => {
+                            this.validIds.forEach(cur => {
+                                cur == item.id ? item.enabled = true : false
+                            })
                         })
-                    })
+                    }
+                    this.isFavorite = res.isCollect
                 }
             })
         },
@@ -120,7 +122,7 @@
                 this.isFavorite = !this.isFavorite
             },
             confirmApply() {
-                this.$router.push('/shop/writeApply')
+                this.$router.push('/shop/writeApply/' + this.info.applyViewId + '?serviceProId=' + this.info.id)
             },
             confirmPay() {
                 if (!this.specificationNo) {
@@ -152,7 +154,8 @@
                     })
                 }
 
-                if (rowIndex === this.orderLabels.length - 1) {
+                var canOrder = this.orderLabels[this.orderLabels.length - 1].items.find(item => item.selected)
+                if (rowIndex === this.orderLabels.length - 1 || canOrder) {
                     let totalId_ = ''
                     this.orderLabels.forEach(item => {
                         item.items.forEach(cur => {

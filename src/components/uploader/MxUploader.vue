@@ -33,10 +33,20 @@
             deelFiles: {
                 type: Array,
                 required: true
+            },
+            imageApi: {
+                type: String,
+                required: true
+            },
+            fileId: {
+                type: Number,
+                required: true
             }
         },
         data() {
-            return {}
+            return {
+                formData: null
+            }
         },
         components: {},
         methods: {
@@ -86,21 +96,21 @@
                     console.warn('no file!');
                     return
                 }
-                const formData = new FormData()
+                _this.formData = new FormData()
                 this.deelFiles.forEach((item) => {
-                    formData.append(Math.random() + '', item)
+                    _this.formData.append(Math.random() + '', item)
                 })
                 console.log(this.files)
                 const xhr = new XMLHttpRequest()
-                xhr.open('POST', '/platform/image', true)
-                xhr.send(formData)
+                xhr.open('POST', _this.imageApi, true)
+                xhr.send(_this.formData)
                 xhr.responseType = 'json'
                 xhr.onload = () => {
                     this.uploading = false
                     if (xhr.status === 200 || xhr.status === 304) {
                         this.status = 'finished'
                         console.log('upload success!')
-                        _this.$emit('uploadend', xhr.response.data)
+                        _this.$emit('uploadend', xhr.response.data, _this.fileId)
                     } else {
                         console.log(`error：error code ${xhr.status}`)
                     }

@@ -169,3 +169,79 @@ export const getCommentList = function (id, obj) {
         ...obj
     })
 }
+
+// 提交订单
+export const postOrder = function (postInfo) {
+    return Vue.http.post(baseURL + '/wechat/applyOrder/order', {
+        ...postInfo
+    })
+}
+
+// 获取我的订单列表
+export const getMyOrderList = function () {
+    return Vue.http.get(baseURL + '/wechat/applyOrder?applyOrderType=ORDER')
+}
+
+// 获取订单详情
+export const getOrderdetail = function (id) {
+    return Vue.http.get(baseURL + '/wechat/applyOrder/' + id)
+}
+
+// 取消未支付订单
+export const cancelOrder = function (id) {
+    return Vue.http.put(baseURL + '/wechat/applyOrder/order/cancel/' + id, {
+        id
+    })
+}
+
+// 确认订单
+export const confirmOrder = function (id) {
+    return Vue.http.put(baseURL + '/wechat/applyOrder/order/verify/' + id, {
+        id
+    })
+}
+
+// 提交申请单订单评论
+export const commitComment = function (postInfo) {
+    return Vue.http.post(baseURL + '/wechat/serviceComment', {
+        ...postInfo
+    })
+}
+
+// 获取申请单模板
+export const getApplyTemplate = function (id) {
+    return Vue.http.get(baseURL + '/commons/applyTemplate/' + id)
+}
+
+// 申请单提交
+export const postApplyTemplate = function (postInfo) {
+    return Vue.http.post(baseURL + '/wechat/applyOrder/apply', {
+        ...postInfo
+    })
+}
+
+// 获取我的申请列表
+export const getApplyList = function (obj) {
+    return Vue.http.get(baseURL + '/wechat/applyOrder?applyOrderType=APPLY', {
+        params: { ...obj }
+    })
+}
+
+// 获取申请列表详情
+export const getApplyDetail = function (id) {
+    return Vue.http.get(baseURL + '/wechat/applyOrder/' + id)
+}
+
+// 申请单服务确认
+export const applyServiceConfirm = function (id) {
+    return Vue.http.put(baseURL + '/wechat/applyOrder/apply/verify/' + id, {
+        id
+    })
+}
+
+// 申请单取消申请
+export const cancelApply = function (id) {
+    return Vue.http.put(baseURL + '/wechat/applyOrder/apply/cancel/' + id, {
+        id
+    })
+}
