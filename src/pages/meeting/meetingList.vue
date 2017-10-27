@@ -97,8 +97,11 @@
                 .then(() => this.getOffsetDate(4))
                 .then(() => this.$dialog.loading.close())
                 .catch(e => {
+                    this.$dialog.toast({
+                        mes: e.statusText,
+                        timeout: 500
+                    });
                     this.$dialog.loading.close()
-                    console.log(e)
                 })
         },
         data() {
@@ -129,10 +132,20 @@
             },
             getOffsetDate(offsetDay) {
                 return getMeetingList(moment().add(offsetDay, 'days').format('YYYY-MM-DD')).then(res => {
-                    this.infos.push({
-                        date: moment().add(offsetDay, 'days').format('MM月DD日'),
-                        room: res.body.data,
-                    })
+                    if (res.body.code == 200) {
+                        this.infos.push({
+                            date: moment().add(offsetDay, 'days').format('MM月DD日'),
+                            room: res.body.data,
+                        })
+                    } else {
+                        this.$dialog.toast({mes: res.body.message, timeout: 500})
+                    }
+                }).catch(e => {
+                    this.$dialog.toast({
+                        mes: e.statusText,
+                        timeout: 500
+                    });
+                    this.$dialog.loading.close()
                 })
             }
         }

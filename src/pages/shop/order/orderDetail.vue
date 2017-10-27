@@ -83,26 +83,13 @@
         <div class="step-info">
             <span class="title">流程跟踪</span>
             <span class="content">
-                <span class="row">
+                <span class="row" v-for="(item, idx) in orderInfo.record" :key="idx">
                     <span class="text">
-                        <img src="../../../common/images/ic_progress1@3x.png" />
-                        <span class="info">已支付-待处理</span>
+                        <img v-if="idx === 0" src="../../../common/images/ic_progress1@3x.png" />
+                        <img v-if="idx !== 0" src="../../../common/images/ic_progress2@3x.png" />
+                        <span class="info">{{ item.beforeOperation }}-{{ item.afterOperation }}</span>
                     </span>
-                    <span class="date">2017-09-17 16:02</span>
-                </span>
-                <span class="row">
-                    <span class="text">
-                        <img src="../../../common/images/ic_progress2@3x.png" />
-                        <span class="info">已支付-待处理</span>
-                    </span>
-                    <span class="date">2017-09-17 16:02</span>
-                </span>
-                <span class="row">
-                    <span class="text">
-                        <img src="../../../common/images/ic_progress2@3x.png" />
-                        <span class="info">已支付-待处理</span>
-                    </span>
-                    <span class="date">2017-09-17 16:02</span>
+                    <span class="date">{{ moment(item.createTime).format('YYYY-MM-DD HH:mm') }}</span>
                 </span>
             </span>
         </div>
@@ -156,7 +143,8 @@
         getOrderdetail,
         cancelOrder,
         confirmOrder,
-        commitComment
+        commitComment,
+        prePayOrder
     } from '../../../api/shopApi'
 
     export default {
@@ -180,11 +168,20 @@
         methods: {
             // 去支付
             goToPay() {
-                this.$router.push({
-                    path: '/shop/pay',
-                    query: {
-                        orderNo: this.orderInfo.applyOrderNo,
-                        orderId: this.orderInfo.applyOrderId
+                prePayOrder({
+                    order_no: this.orderInfo.applyOrderNo
+                }).then(response => {
+                    if (response.body.code == 200) {
+                        console.log(response.body)
+                        return
+
+                        this.$router.push({
+                            path: '/shop/pay',
+                            query: {
+                                orderNo: this.orderInfo.applyOrderNo,
+                                orderId: this.orderInfo.applyOrderId
+                            }
+                        })
                     }
                 })
             },

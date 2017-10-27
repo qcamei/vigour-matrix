@@ -2,7 +2,7 @@
     <div style="height: 100%; padding-bottom: 1.2rem" v-if="info">
         <yd-slider autoplay="3000" style="height: 3.8rem" v-if="info && info.listImage.length">
             <yd-slider-item v-for="(item, idx) in info.listImage" :key="idx">
-                <a href="#">
+                <a href="javascript:;">
                     <img :src="item.path">
                 </a>
             </yd-slider-item>

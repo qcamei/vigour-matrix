@@ -98,7 +98,13 @@
                                 timeout: 500
                             })
                         }
-                    }).catch(e => console.log(e))
+                    }).catch(e => {
+                    this.$dialog.toast({
+                        mes: e.statusText,
+                        timeout: 500
+                    });
+                    this.$dialog.loading.close()
+                })
             }
         }
     }

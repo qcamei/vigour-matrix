@@ -65,7 +65,7 @@
         methods: {
             sendCode() {
                 if (!/^1[34578]\d{9}$/.test(this.info.cellPhone)) {
-                    this.$dialog.toast({mes: '请输入正确的手机号', long: 500});
+                    this.$dialog.toast({mes: '请输入正确的手机号', timeout: 500});
                     return
                 }
 
@@ -88,6 +88,12 @@
                         });
                         this.$dialog.loading.close()
                     }
+                }).catch(e => {
+                    this.$dialog.toast({
+                        mes: e.statusText,
+                        timeout: 500
+                    });
+                    this.$dialog.loading.close()
                 })
             },
             login() {
@@ -129,7 +135,13 @@
                             setTimeout(() => this.$router.push('/choose-park'), 300)
                         }
                     }
-                }).catch(e => console.log(e))
+                }).catch(e => {
+                    this.$dialog.toast({
+                        mes: e.statusText,
+                        timeout: 500
+                    });
+                    this.$dialog.loading.close()
+                })
             },
             switchRedirect() {
                 switch (this.type) {
@@ -144,6 +156,9 @@
                         break;
                     case 'bill':
                         this.$router.replace('/bill/unbound')
+                        break;
+                    case 'shop':
+                        this.$router.replace('/shop/home')
                         break;
                 }
             },
@@ -160,6 +175,9 @@
                         break;
                     case 'bill':
                         window.sessionStorage.setItem('redirectType', '4')
+                        break;
+                    case 'shop':
+                        window.sessionStorage.setItem('redirectType', '5')
                         break;
                 }
             }

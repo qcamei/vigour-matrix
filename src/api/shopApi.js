@@ -234,7 +234,14 @@ export const getApplyDetail = function (id) {
 
 // 申请单服务确认
 export const applyServiceConfirm = function (id) {
-    return Vue.http.put(baseURL + '/wechat/applyOrder/apply/verify/' + id, {
+    return Vue.http.put(baseURL + '/wechat/applyOrder/apply/verify/service/' + id, {
+        id
+    })
+}
+
+// 申请单确认下单
+export const applyOrderConfirm = function (id) {
+    return Vue.http.put(baseURL + '/wechat/applyOrder/apply/verify/service/order/' + id, {
         id
     })
 }
@@ -243,5 +250,12 @@ export const applyServiceConfirm = function (id) {
 export const cancelApply = function (id) {
     return Vue.http.put(baseURL + '/wechat/applyOrder/apply/cancel/' + id, {
         id
+    })
+}
+
+// 预下单
+export const prePayOrder = function (postInfo) {
+    return Vue.http.post(baseURL + '/pay/wechat/pay', {
+        ...postInfo
     })
 }

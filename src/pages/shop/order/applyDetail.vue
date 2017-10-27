@@ -116,12 +116,12 @@
         </div>
 
         <!--底部按钮区-->
-        <!--待确认申请-->
-        <div class="posts-btn-con" v-if="false">
+        <!--待确认下单-->
+        <div class="posts-btn-con" v-if="applyInfo.applyOrderStatus === 'APPLYWAITVERIFY'">
             <yd-button @click.native="cancelApplyPut" class="posts-btn" type="hollow" bgcolor="#fff" color="#00A7A3"
                        style="border: 1px solid #e7e7e7">取消申请
             </yd-button>
-            <yd-button @click.native="" class="posts-btn" type="primary" bgcolor="#00A7A3" color="#fff">申请确认
+            <yd-button @click.native="applyOrderConfirmPut" class="posts-btn" type="primary" bgcolor="#00A7A3" color="#fff">申请确认
             </yd-button>
         </div>
 
@@ -143,7 +143,7 @@
 </template>
 <script>
     import { Rate } from 'vue-ydui/dist/lib.rem/rate'
-    import { getApplyDetail, applyServiceConfirm, commitComment, cancelApply } from '../../../api/shopApi'
+    import { getApplyDetail, applyServiceConfirm, commitComment, cancelApply, applyOrderConfirm } from '../../../api/shopApi'
     import { LightBox, LightBoxImg, LightBoxTxt } from 'vue-ydui/dist/lib.rem/lightbox';
 
     export default {
@@ -182,6 +182,18 @@
             },
             serviceConfirm() {
                 applyServiceConfirm(this.$route.params.id).then(response => {
+                    if (response.body.code == 200) {
+                        this.$dialog.toast({
+                            mes: '确认成功',
+                            timeout: 500,
+                            icon: 'success',
+                            callback: this.$router.go(-1)
+                        })
+                    }
+                })
+            },
+            applyOrderConfirmPut() {
+                applyOrderConfirm(this.$route.params.id).then(response => {
                     if (response.body.code == 200) {
                         this.$dialog.toast({
                             mes: '确认成功',

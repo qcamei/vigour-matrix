@@ -65,7 +65,8 @@
         getMyAddress,
         getServiceDetail,
         getInvoiceInfo,
-        postOrder
+        postOrder,
+        prePayOrder
     } from '../../../api/shopApi'
     export default {
         created() {
@@ -135,10 +136,25 @@
                 this.invoiceType === 'ENTERPRISE' ? postInfo.invoiceId = this.invoiceInfo.id : void 0
 
                 postOrder(postInfo).then(response => {
-                    if (response.body.code == 200) {
-                        console.log(response.body)
-                        this.$router.push('/shop/pay')
-                    }
+                    if (response.body.code == 200)
+                        prePayOrder({
+                            order_no: response.body.data.applyOrderNo
+                        }).then(res => {
+                            if (res.body.code == 200) {
+                                return console.log(res.body)
+                                this.$router.push('/shop/pay')
+                            }
+                            else {
+                                this.$dialog.toast({
+                                    mes: res.body.message,
+                                    timeout: 500
+                                })
+                            }
+                        }).catch(e => {
+                            this.$dialog.toast({mes: e.statusText, timeout: 500})
+                        })
+                    else
+                        this.$dialog.toast({mes: response.body.message, timeout: 500})
                 })
 
             },

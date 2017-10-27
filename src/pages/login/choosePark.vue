@@ -70,6 +70,9 @@
                     case '4':
                         this.$router.replace('/bill/list')
                         break;
+                    case '5':
+                        this.$router.replace('/shop/home')
+                        break;
                 }
             }
         }
