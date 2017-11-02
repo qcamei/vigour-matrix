@@ -107,9 +107,23 @@
                 this.$dialog.loading.open('加载中')
                 this.getData().then(response => {
                         if (response.body.code == 200) {
-                            const _list = this.$route.query.mode === 'special'
-                                ? response.body.data[0].siftItems
-                                : response.body.data.items
+                            let _list = null
+
+                            if (this.$route.query.mode === 'special') {
+                                if (!response.body.data.length) {
+                                    this.$dialog.loading.close()
+                                    this.historyFlag = true
+                                    return
+                                }
+                                if (!response.body.data[0].siftItems.length) {
+                                    this.$dialog.loading.close()
+                                    this.historyFlag = true
+                                    return
+                                }
+                                _list = response.body.data[0].siftItems
+                            } else {
+                                _list = response.body.data.items
+                            }
 
                             this.list = [...this.list, ..._list]
 

@@ -34,12 +34,15 @@
         </div>
 
         <!--评论回复-->
-        <div class="comment-info">
+        <div
+            class="comment-info"
+            v-if="applyInfo.applyOrderStatus != 'APPLYWAITALLOT' && applyInfo.applyOrderStatus != 'APPLYWAITASSESS'"
+        >
             <span class="title">评论回复</span>
             <span class="content">
-                <span>可以接受，会按时发货</span>
+                <span>{{ applyInfo.assessMemo }}</span>
                 <div class="thumb">
-                    <img src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3601388998,136244981&fm=27&gp=0.jpg" />
+                    <img v-lazy="applyInfo.assessUrl" />
                 </div>
             </span>
         </div>
@@ -74,26 +77,12 @@
         <div class="step-info">
             <span class="title">流程跟踪</span>
             <span class="content">
-                <span class="row">
+                <span class="row" v-for="(item, index) in applyInfo.record" :key="index">
                     <span class="text">
                         <img src="../../../common/images/ic_progress1@3x.png" />
-                        <span class="info">已支付-待处理</span>
+                        <span class="info">{{ item.beforeOperation }}-{{ item.afterOperation }}</span>
                     </span>
-                    <span class="date">2017-09-17 16:02</span>
-                </span>
-                <span class="row">
-                    <span class="text">
-                        <img src="../../../common/images/ic_progress2@3x.png" />
-                        <span class="info">已支付-待处理</span>
-                    </span>
-                    <span class="date">2017-09-17 16:02</span>
-                </span>
-                <span class="row">
-                    <span class="text">
-                        <img src="../../../common/images/ic_progress2@3x.png" />
-                        <span class="info">已支付-待处理</span>
-                    </span>
-                    <span class="date">2017-09-17 16:02</span>
+                    <span class="date">{{  }}</span>
                 </span>
             </span>
         </div>
@@ -310,7 +299,7 @@
             transform translateY(-50%)
     .step-info
         background-color #fff
-        margin-bottom .2rem
+        margin-bottom 1.4rem
         .title
             display flex
             height .76rem

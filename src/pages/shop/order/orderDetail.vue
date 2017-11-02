@@ -170,20 +170,34 @@
             goToPay() {
                 prePayOrder({
                     order_no: this.orderInfo.applyOrderNo
-                }).then(response => {
-                    if (response.body.code == 200) {
-                        console.log(response.body)
-                        return
-
-                        this.$router.push({
-                            path: '/shop/pay',
-                            query: {
-                                orderNo: this.orderInfo.applyOrderNo,
-                                orderId: this.orderInfo.applyOrderId
-                            }
+                }).then(res => {
+                    if (res.body.code == 200) {
+                        if (res.body.data.credential.wx.return_code === 'SUCCESS') {
+                            let wx_data = JSON.stringify(res.body.data.credential.wx)
+                            let orderInfo = JSON.stringify({
+                                tempPrice: orderInfo.price,
+                                imageUrl: orderInfo.mainImage,
+                                prodName: orderInfo.mainTitle
+                            })
+                            this.$router.push({
+                                path: '/shop/pay',
+                                query: {
+                                    wx_data: encodeURIComponent(wx_data),
+                                    orderInfo: encodeURIComponent(orderInfo)
+                                }
+                            })
+                        }
+                        else {
+                            this.$dialog.toast({mes: res.body.data.credential.wx.return_message, timeout: 800})
+                        }
+                    }
+                    else {
+                        this.$dialog.toast({
+                            mes: res.body.message,
+                            timeout: 800
                         })
                     }
-                })
+                }).catch(e => this.$dialog.toast({mes: e.statusText, timeout: 800}))
             },
             // 取消订单
             cancelOrderPut() {
@@ -317,7 +331,7 @@
             transform translateY(-50%)
     .step-info
         background-color #fff
-        margin-bottom .2rem
+        margin-bottom 1.4rem
         .title
             display flex
             height .76rem

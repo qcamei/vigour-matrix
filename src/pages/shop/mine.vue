@@ -2,10 +2,10 @@
     <div id="mine">
         <div class="profile-con">
             <div class="avatar">
-                <img v-lazy="'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3601388998,136244981&fm=27&gp=0.jpg'" />
+                <img v-lazy="headimgurl" />
             </div>
-            <span class="username">萨瓦迪卡</span>
-            <span class="parkname">张江高科技园区</span>
+            <span class="username">{{ nickname }}</span>
+            <span class="parkname">{{ parkName }}</span>
         </div>
 
         <yd-cell-group style="margin-top: .2rem">
@@ -51,13 +51,26 @@
 </template>
 <script>
     import { TabBar, TabBarItem } from 'vue-ydui/dist/lib.rem/tabbar'
+    import { getUserProfile } from '../../api/shopApi'
 
     export default {
         created() {
             document.title = this.$route.meta.title
+
+            getUserProfile().then(response => {
+                if (response.body.code == 200) {
+                    this.headimgurl = response.body.data.headimgurl
+                    this.nickname = response.body.data.nickname
+                    this.parkName = response.body.data.parkName
+                }
+            })
         },
         data() {
-            return {}
+            return {
+                headimgurl: '',
+                nickname: '',
+                parkName: '',
+            }
         },
         components: {
             [TabBar.name]: TabBar,

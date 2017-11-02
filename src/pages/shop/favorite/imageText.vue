@@ -27,5 +27,8 @@
         width 100%
         background-color #fff
         font-size .26rem
-        padding .2rem
+        padding .2rem .2rem 1.4rem
+        overflow hidden
+        img
+            width 100% !important
 </style>

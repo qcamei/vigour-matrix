@@ -3,7 +3,7 @@
         <yd-slider autoplay="3000" class="banner-con">
             <yd-slider-item v-for="(banner, idx) in banners" :key="idx">
                 <router-link to="#">
-                    <img v-lazy="banner.imageUrl" />
+                    <img :src="banner.imageUrl" />
                 </router-link>
             </yd-slider-item>
         </yd-slider>

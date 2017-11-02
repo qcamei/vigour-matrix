@@ -1,5 +1,5 @@
 <template>
-    <div style="padding-bottom: 1.4rem">
+    <div id="meetingAdd" style="padding-bottom: 1.4rem">
         <yd-cell-group id="input-group" style="margin-bottom: .24rem">
             <yd-cell-item>
                 <span slot="left">预定人姓名</span>

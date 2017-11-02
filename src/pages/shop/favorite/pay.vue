@@ -2,17 +2,17 @@
     <div>
         <div class="service-con">
             <div class="thumb">
-                <img src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3601388998,136244981&fm=27&gp=0.jpg" />
+                <img v-lazy="orderInfo.imageUrl" />
             </div>
             <div class="content">
-                <span class="title">张江世纪花园排水修复工作张江世纪花园排水</span>
-                <span class="text-red">¥ 12,000.00</span>
+                <span class="title">{{ orderInfo.prodName }}</span>
+                <span class="text-red">¥ {{ orderInfo.tempPrice }}</span>
             </div>
         </div>
 
         <div class="total-price">
             <span class="label">订单总金额</span>
-            <span class="value">¥ 12,000.00</span>
+            <span class="value">¥ {{ orderInfo.tempPrice }}</span>
         </div>
 
         <div class="pay-con">
@@ -35,14 +35,63 @@
     export default {
         created() {
             document.title = this.$route.meta.title
+
+            this.wx_data = JSON.parse(decodeURIComponent(this.$route.query.wx_data))
+            this.orderInfo = JSON.parse(decodeURIComponent(this.$route.query.orderInfo))
         },
         data() {
-            return {}
+            return {
+                wx_data: null,
+                orderInfo: null,
+                payFlag: false
+            }
         },
         components: {},
         methods: {
             pay() {
+                if (this.payFlag) return
+                this.payFlag = true
 
+                let vm = this
+                let wx_data = vm.wx_data
+                vm.payFlag = false
+
+                function onBridgeReady() {
+                    // alert('准备支付');
+                    WeixinJSBridge.invoke(
+                        'getBrandWCPayRequest', {
+                            "appId": wx_data.appId,
+                            "timeStamp": wx_data.timeStamp,
+                            "nonceStr": wx_data.nonceStr,
+                            "package": wx_data.package,
+                            "signType": wx_data.signType,
+                            "paySign": wx_data.paySign
+                        },
+                        function (wxres) {
+                            // alert(wxres.err_msg)
+                            if (wxres.err_msg == "get_brand_wcpay_request:ok") {
+                                vm.$dialog.toast({mes: '支付成功', timeout: 800})
+                                vm.$router.replace('/shop/order/myorder')
+                            } else {
+                                alert(JSON.stringify(wxres))
+                                vm.$dialog.toast({mes: '支付未完成', timeout: 800})
+                                vm.$router.replace('/shop/order/myorder')
+                            }
+                        }
+                    );
+                }
+
+                if (typeof WeixinJSBridge == "undefined") {
+                    alert('不在微信环境')
+                    if (document.addEventListener) {
+                        document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+                    } else if (document.attachEvent) {
+                        document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+                        document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+                    }
+                } else {
+                    onBridgeReady();
+                }
             }
         }
     }
@@ -106,8 +155,8 @@
             align-items center
             padding 0 .4rem
             .radio
-                width .44rem
-                height .44rem
+                width .38rem
+                height .38rem
                 margin-right .4rem
             .wechat
                 width .44rem

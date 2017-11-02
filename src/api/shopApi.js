@@ -46,7 +46,7 @@ export const getParkSelfSale = function () {
 
 // 分类获取服务场景icon列表
 export const getStagesIcon = function () {
-    return Vue.http.get(baseURL + '/wechat/serviceProject/parkSelf/index')
+    return Vue.http.get(baseURL + '/wechat/serviceScenario/valid')
 }
 
 // 我的收货地址列表(全部)
@@ -258,4 +258,9 @@ export const prePayOrder = function (postInfo) {
     return Vue.http.post(baseURL + '/pay/wechat/pay', {
         ...postInfo
     })
+}
+
+// 获取用户信息
+export const getUserProfile = function () {
+    return Vue.http.get(baseURL + '/wechatBind/profile')
 }

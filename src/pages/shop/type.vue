@@ -25,9 +25,9 @@
             </div>
 
             <div class="type-con" v-show="tabIndex === 2">
-                <router-link v-for="(stage, idx) in stages" :to="{path: `/shop/serviceList/${stage.serviceProId}`, query: {mode: 'stage'}}" class="type-item" :key="idx">
-                    <img v-lazy="stage.mainImage" />
-                    <span>{{ stage.mainTitle }}</span>
+                <router-link v-for="(stage, idx) in stages" :to="{path: `/shop/serviceList/${stage.id}`, query: {mode: 'stage'}}" class="type-item" :key="idx">
+                    <img v-lazy="stage.scaneLogo" />
+                    <span>{{ stage.name }}</span>
                 </router-link>
             </div>
         </div>
@@ -166,11 +166,10 @@
                 span
                     font-size .2rem
                     color #999
-                    width 1rem
-                    height .44rem
+                    width 100%
                     margin-top .2rem
-                    display -webkit-box
-                    -webkit-line-clamp 2
-                    -webkit-box-orient vertical
+                    text-overflow ellipsis
+                    white-space nowrap
                     overflow hidden
+                    text-align center
 </style>

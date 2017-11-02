@@ -5,14 +5,17 @@
                 <div class="local-icon"></div>
             </div>
             <div class="info-con" v-if="defaultAddress">
-                <span class="name">{{ defaultAddress.contacts }} &nbsp;&nbsp;&nbsp;&nbsp; {{ defaultAddress.phone }}</span>
-                <span class="address">{{ defaultAddress.proviceName + defaultAddress.cityName + defaultAddress.countyName + defaultAddress.addr }}</span>
+                <span class="name">{{ defaultAddress.contacts }} &nbsp;&nbsp;&nbsp;&nbsp; {{ defaultAddress.phone
+                    }}</span>
+                <span
+                    class="address">{{ defaultAddress.proviceName + defaultAddress.cityName + defaultAddress.countyName + defaultAddress.addr
+                    }}</span>
             </div>
         </div>
 
         <div class="service-con" v-if="servicePro">
             <div class="thumb">
-                <img v-lazy="servicePro.mainImage[0].path" />
+                <img v-lazy="servicePro.mainImage[0].path"/>
             </div>
             <div class="content">
                 <span class="title">{{ servicePro.mainTitle }}</span>
@@ -46,7 +49,8 @@
                 </yd-cell-item>
                 <yd-cell-item arrow>
                     <span slot="left">发票内容</span>
-                    <span slot="right" class="detail" @click="$router.push('/shop/editInvoice/' + invoiceInfo.id)">明细</span>
+                    <span slot="right" class="detail"
+                          @click="$router.push('/shop/editInvoice/' + invoiceInfo.id)">明细</span>
                 </yd-cell-item>
             </yd-cell-group>
         </div>
@@ -68,6 +72,7 @@
         postOrder,
         prePayOrder
     } from '../../../api/shopApi'
+
     export default {
         created() {
             document.title = this.$route.meta.title
@@ -111,8 +116,7 @@
                 invoiceType: null
             }
         },
-        components: {
-        },
+        components: {},
         methods: {
             changeAddress() {
                 this.$router.push('/shop/myAddress')
@@ -136,26 +140,43 @@
                 this.invoiceType === 'ENTERPRISE' ? postInfo.invoiceId = this.invoiceInfo.id : void 0
 
                 postOrder(postInfo).then(response => {
-                    if (response.body.code == 200)
+                    if (response.body.code == 200) {
                         prePayOrder({
                             order_no: response.body.data.applyOrderNo
-                        }).then(res => {
-                            if (res.body.code == 200) {
-                                return console.log(res.body)
-                                this.$router.push('/shop/pay')
-                            }
-                            else {
-                                this.$dialog.toast({
-                                    mes: res.body.message,
-                                    timeout: 500
-                                })
-                            }
-                        }).catch(e => {
-                            this.$dialog.toast({mes: e.statusText, timeout: 500})
                         })
-                    else
-                        this.$dialog.toast({mes: response.body.message, timeout: 500})
-                })
+                            .then(res => {
+                                if (res.body.code == 200) {
+                                    if (res.body.data.credential.wx.return_code === 'SUCCESS') {
+                                        let wx_data = JSON.stringify(res.body.data.credential.wx)
+                                        let orderInfo = JSON.stringify({
+                                            tempPrice: postInfo.tempPrice,
+                                            imageUrl: this.servicePro.mainImage[0].path,
+                                            prodName: this.servicePro.mainTitle
+                                        })
+                                        this.$router.push({
+                                            path: '/shop/pay',
+                                            query: {
+                                                wx_data: encodeURIComponent(wx_data),
+                                                orderInfo: encodeURIComponent(orderInfo)
+                                            }
+                                        })
+                                    }
+                                    else {
+                                        this.$dialog.toast({mes: res.body.data.credential.wx.return_message, timeout: 800})
+                                    }
+                                }
+                                else {
+                                    this.$dialog.toast({
+                                        mes: res.body.message,
+                                        timeout: 800
+                                    })
+                                }
+                            }).catch(e => this.$dialog.toast({mes: e.statusText, timeout: 800}))
+                    }
+                    else {
+                        this.$dialog.toast({mes: response.body.message, timeout: 800})
+                    }
+                }).catch(e => this.$dialog.toast({mes: e.statusText, timeout: 800}))
 
             },
         }
@@ -165,6 +186,7 @@
     span
         color #262626
         font-size .26rem
+
     .address-item
         position relative
         display flex
@@ -208,6 +230,7 @@
                 font-size .24rem
                 margin-top .14rem
                 line-height 1.2
+
     .service-con
         background-color #fff
         padding .2rem
@@ -235,6 +258,7 @@
                 color #333
             .text-red
                 color #E65966
+
     .total-price
         background-color #ffffff
         border-bottom 1px solid #e7e7e7
@@ -247,6 +271,7 @@
             color #333333
         .value
             color #E65966
+
     .invoice-con
         background-color #ffffff
         .title
@@ -262,6 +287,7 @@
             display flex
             align-items center
             justify-content flex-end
+
     .posts-btn-con
         display flex
         justify-content space-around
