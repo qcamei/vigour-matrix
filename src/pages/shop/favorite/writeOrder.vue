@@ -37,7 +37,7 @@
         <yd-cell-group style="margin-bottom: .2rem" v-if="!invoiceInfo">
             <yd-cell-item arrow @click.native="billSetting" style="padding-left: .2rem">
                 <span slot="left">发票</span>
-                <span slot="right">不开票</span>
+                <span slot="right">{{ descText }}</span>
             </yd-cell-item>
         </yd-cell-group>
 
@@ -105,6 +105,7 @@
             }
 
             if (invoiceType === '个人' && !invoiceId) {
+                this.descText = '个人'
                 this.invoiceType = 'INDIVIDUAL'
             }
         },
@@ -113,7 +114,8 @@
                 defaultAddress: null,
                 servicePro: null,
                 invoiceInfo: null,
-                invoiceType: null
+                invoiceType: null,
+                descText: '不开票'
             }
         },
         components: {},
@@ -122,7 +124,12 @@
                 this.$router.push('/shop/myAddress')
             },
             billSetting() {
-                this.$router.push('/shop/billSettings/' + this.$route.query.serviceProId)
+                this.$router.push({
+                    path: '/shop/billSettings/' + this.$route.query.serviceProId,
+                    query: {
+                        invoiceType: this.descText
+                    }
+                })
             },
             cancel() {
                 this.$router.go(-1)

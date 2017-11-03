@@ -7,7 +7,7 @@
              :style="txtStyle">
             <slot></slot>
         </div>
-        <div class="deleteIcon" :style="zIndex" @click.stop.prevent="deleteItem(itemId)">
+        <div class="deleteIcon" :style="deleteStyles" @click.stop.prevent="deleteItem(itemId)">
             <yd-icon name="delete" color="#fff"></yd-icon>
         </div>
     </div>
@@ -16,7 +16,8 @@
 <script>
     export default {
         props: {
-            itemId: Number
+            itemId: Number,
+            deleteStyles: String
         },
         data() {
             return {
@@ -26,7 +27,6 @@
                 txtStyle: '',
                 delWidth: 200,
                 top: '',
-                zIndex: 'z-index:-1',
             }
         },
         methods: {
@@ -89,11 +89,11 @@
     .move {
         position: relative;
         transition: all .5s;
+        background-color: #fff;
     }
 
     .deleteIcon {
         width: 2rem;
-        height: calc(100% - .2rem);
         position: absolute;
         right: 0;
         top: 0;

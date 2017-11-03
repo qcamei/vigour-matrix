@@ -115,6 +115,20 @@ button, input, select, textarea
     input
         font-size .26rem !important
         text-align right
+    .left-delete
+        .move
+            .yd-cell-item::after
+                content: ""
+                position: absolute
+                z-index: 0
+                bottom: 0
+                left: 0
+                width: 100%
+                border-bottom: 1px solid #eee
+                -webkit-transform: scaleY(.5)
+                transform: scaleY(.5)
+                -webkit-transform-origin: 0 0
+                transform-origin: 0 0
 #writeApply
     .yd-cell-item
         padding-left .2rem

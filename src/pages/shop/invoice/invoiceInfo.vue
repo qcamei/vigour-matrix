@@ -1,21 +1,33 @@
 <template>
     <div id="invoiceInfo">
         <yd-cell-group>
-            <yd-cell-item style="position: relative;" v-if="info.length" v-for="(item, idx) in info" :key="idx">
-                <span slot="left">{{ item.enterpriseName }}</span>
-                <span slot="right">
-                    <img @click="editInvoice(item.id)" class="edit-icon" src="../../../common/images/ic_edit@3x.png" />
+            <mx-slide-delete
+                :itemId="item.id"
+                @deleteItem="deleteItem(item.id)"
+                ref="deleteCon"
+                v-if="info.length"
+                v-for="(item, idx) in info"
+                :key="idx"
+                deleteStyles="z-index: -1; height: 100%"
+            >
+                <yd-cell-item >
+                    <span slot="left">{{ item.enterpriseName }}</span>
+                    <span slot="right">
+                    <img @click="editInvoice(item.id)" class="edit-icon" src="../../../common/images/ic_edit@3x.png"/>
                 </span>
-            </yd-cell-item>
+                </yd-cell-item>
+            </mx-slide-delete>
+
             <yd-cell-item @click.native="addInvoice">
-                <img slot="icon" src="../../../common/images/ic_plus@3x.png" />
+                <img slot="icon" src="../../../common/images/ic_plus@3x.png"/>
                 <span slot="left" style="margin-left: .1rem;">添加企业开票信息</span>
             </yd-cell-item>
         </yd-cell-group>
     </div>
 </template>
 <script>
-    import { getInvoiceInfo } from '../../../api/shopApi'
+    import { getInvoiceInfo, removeInvoiceInfo } from '../../../api/shopApi'
+    import MxSlideDelete from '../../../components/slideDelete/MxSlideDelete.vue'
 
     export default {
         created() {
@@ -26,18 +38,30 @@
                 }
             })
         },
+        updated() {
+        },
         data() {
             return {
                 info: []
             }
         },
-        components: {},
+        components: {
+            MxSlideDelete
+        },
         methods: {
             editInvoice(id) {
                 this.$router.push('/shop/editInvoice/' + id)
             },
             addInvoice() {
                 this.$router.push('/shop/addInvoice')
+            },
+            deleteItem(id) {
+                removeInvoiceInfo(id).then(response => {
+                    if (response.body.code == 200) {
+                        this.info = this.info.filter(item => item.id != id)
+                        this.$refs.deleteCon.forEach(item => item.txtStyle = '')
+                    }
+                })
             }
         }
     }
@@ -50,6 +74,7 @@
         right .2rem
         top 50%
         transform translateY(-50%)
+
     #invoiceInfo
         span
             font-size .26rem

@@ -3,7 +3,12 @@
         <yd-infinitescroll :callback="loadList" :distance="50" ref="infinitescrollDemo">
             <yd-list slot="list">
                 <router-link :to="`/shop/serviceDetail/${item.id}/imageText`" v-for="(item, idx) in list" :key="idx">
-                    <mx-slide-delete :itemId="item.id" @deleteItem="deleteItem(item.id)" ref="deleteCon">
+                    <mx-slide-delete
+                        :itemId="item.id"
+                        @deleteItem="deleteItem(item.id)"
+                        ref="deleteCon"
+                        deleteStyles="z-index: -1; height: calc(100% - .2rem)"
+                    >
                         <div class="favorite-item">
                             <div class="img-con">
                                 <img v-lazy="item.mainImage[0].path" />

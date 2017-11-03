@@ -1,7 +1,7 @@
 <template>
     <div id="myOrderDetail" v-if="orderInfo">
         <!--订单状态-->
-        <yd-cell-group style="margin-bottom: .2rem;" >
+        <yd-cell-group style="margin-bottom: .2rem;">
             <yd-cell-item>
                 <span slot="left">订单号：{{ orderInfo.applyOrderNo }}</span>
                 <span slot="right">
@@ -22,9 +22,9 @@
         </yd-cell-group>
 
         <!--服务项目-->
-        <div class="service-con" >
+        <div class="service-con">
             <div class="thumb">
-                <img v-lazy="orderInfo.mainImage" />
+                <img v-lazy="orderInfo.mainImage"/>
             </div>
             <div class="content">
                 <span class="title">{{ orderInfo.mainTitle }}</span>
@@ -40,7 +40,7 @@
         </div>
 
         <!--订单备注-->
-        <yd-cell-group style="margin-bottom: .2rem" >
+        <yd-cell-group style="margin-bottom: .2rem">
             <yd-cell-item>
                 <span slot="left">订单备注</span>
                 <span slot="right" style="width: 100%">
@@ -48,13 +48,13 @@
                         type="text"
                         value="暂无信息"
                         style="text-align: right; width: 100%; padding-left: .2rem"
-                        v-model="orderInfo.orderMemo" />
+                        v-model="orderInfo.orderMemo"/>
                 </span>
             </yd-cell-item>
         </yd-cell-group>
 
         <!--收货信息-->
-        <div class="save-info" >
+        <div class="save-info">
             <span class="title">收货信息</span>
             <span class="content" v-if="orderInfo.address">
                 <span>{{ orderInfo.address.contacts }} {{ orderInfo.address.phone }}</span>
@@ -76,7 +76,7 @@
                     <span>{{ orderInfo.invoice.enterpriseName }}</span>
                 </div>
             </div>
-            <img class="edit-icon" src="../../../common/images/ic_edit@3x.png" />
+            <img class="edit-icon" src="../../../common/images/ic_edit@3x.png"/>
         </div>
 
         <!--流程跟踪-->
@@ -85,8 +85,8 @@
             <span class="content">
                 <span class="row" v-for="(item, idx) in orderInfo.record" :key="idx">
                     <span class="text">
-                        <img v-if="idx === 0" src="../../../common/images/ic_progress1@3x.png" />
-                        <img v-if="idx !== 0" src="../../../common/images/ic_progress2@3x.png" />
+                        <img v-if="idx === 0" src="../../../common/images/ic_progress1@3x.png"/>
+                        <img v-if="idx !== 0" src="../../../common/images/ic_progress2@3x.png"/>
                         <span class="info">{{ item.beforeOperation }}-{{ item.afterOperation }}</span>
                     </span>
                     <span class="date">{{ moment(item.createTime).format('YYYY-MM-DD HH:mm') }}</span>
@@ -116,7 +116,8 @@
         <!--底部按钮区-->
         <!--待支付-->
         <div class="posts-btn-con" v-if="orderInfo.applyOrderStatus === 'WAITPAY'">
-            <yd-button @click.native="cancelOrderPut" class="posts-btn" type="hollow" bgcolor="#fff" color="#00A7A3" style="border: 1px solid #e7e7e7">取消订单
+            <yd-button @click.native="cancelOrderPut" class="posts-btn" type="hollow" bgcolor="#fff" color="#00A7A3"
+                       style="border: 1px solid #e7e7e7">取消订单
             </yd-button>
             <yd-button @click.native="goToPay" class="posts-btn" type="primary" bgcolor="#00A7A3" color="#fff">去支付
             </yd-button>
@@ -124,21 +125,24 @@
 
         <!--待确认-->
         <div class="posts-btn-con" v-if="orderInfo.applyOrderStatus === 'ORDERWAITVERIFY'">
-            <yd-button @click.native="" class="posts-btn" type="hollow" bgcolor="#fff" color="#00A7A3" style="border: 1px solid #e7e7e7">联系客服
+            <yd-button @click.native="" class="posts-btn" type="hollow" bgcolor="#fff" color="#00A7A3"
+                       style="border: 1px solid #e7e7e7">联系客服
             </yd-button>
-            <yd-button @click.native="confirmOrderPut" class="posts-btn" type="primary" bgcolor="#00A7A3" color="#fff">订单确认
+            <yd-button @click.native="confirmOrderPut" class="posts-btn" type="primary" bgcolor="#00A7A3" color="#fff">
+                订单确认
             </yd-button>
         </div>
 
         <!--待评价-->
         <div class="posts-btn-con" v-if="orderInfo.applyOrderStatus === 'ORDERWAITCOMMENT'">
-            <yd-button @click.native="commitCommentPost" class="posts-btn" type="primary" bgcolor="#00A7A3" color="#fff" style="width: 100%">提交评价
+            <yd-button @click.native="commitCommentPost" class="posts-btn" type="primary" bgcolor="#00A7A3" color="#fff"
+                       style="width: 100%">提交评价
             </yd-button>
         </div>
     </div>
 </template>
 <script>
-    import { Rate } from 'vue-ydui/dist/lib.rem/rate'
+    import {Rate} from 'vue-ydui/dist/lib.rem/rate'
     import {
         getOrderdetail,
         cancelOrder,
@@ -175,9 +179,9 @@
                         if (res.body.data.credential.wx.return_code === 'SUCCESS') {
                             let wx_data = JSON.stringify(res.body.data.credential.wx)
                             let orderInfo = JSON.stringify({
-                                tempPrice: orderInfo.price,
-                                imageUrl: orderInfo.mainImage,
-                                prodName: orderInfo.mainTitle
+                                tempPrice: this.orderInfo.price,
+                                imageUrl: this.orderInfo.mainImage,
+                                prodName: this.orderInfo.mainTitle
                             })
                             this.$router.push({
                                 path: '/shop/pay',
@@ -188,7 +192,7 @@
                             })
                         }
                         else {
-                            this.$dialog.toast({mes: res.body.data.credential.wx.return_message, timeout: 800})
+                            this.$dialog.toast({mes: res.body.data.credential.wx.return_msg, timeout: 800})
                         }
                     }
                     else {
@@ -197,7 +201,7 @@
                             timeout: 800
                         })
                     }
-                }).catch(e => this.$dialog.toast({mes: e.statusText, timeout: 800}))
+                }).catch(e => this.$dialog.toast({mes: 'Error', timeout: 800}))
             },
             // 取消订单
             cancelOrderPut() {
@@ -254,6 +258,7 @@
             font-size .26rem !important
         input
             font-size .26rem !important
+
     .service-con
         background-color #fff
         padding .2rem
@@ -283,6 +288,7 @@
                 color #333
                 span
                     margin-right 0 .2rem
+
     .save-info
         position relative
         height 1.68rem
@@ -314,6 +320,7 @@
                 text-overflow ellipsis
                 overflow hidden
                 white-space nowrap
+
     .bill-info
         position relative
         margin-bottom .2rem
@@ -329,6 +336,7 @@
             right .2rem
             top 50%
             transform translateY(-50%)
+
     .step-info
         background-color #fff
         margin-bottom 1.4rem
@@ -359,6 +367,7 @@
                         margin-right .2rem
                 .date
                     font-size .24rem
+
     .service-rattings
         background-color #fff
         margin-bottom 1.2rem
@@ -379,6 +388,7 @@
                 outline none
                 font-size .26rem
                 padding .2rem
+
     .posts-btn-con
         display flex
         justify-content space-around

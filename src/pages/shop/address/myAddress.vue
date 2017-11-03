@@ -1,18 +1,27 @@
 <template>
     <div>
-        <div class="address-item" v-for="item in infos" @click="changeAddress(item)">
-            <div class="icon-con">
-                <div :class="['check-icon', item.isDefault ? 'checked' : '']"></div>
-            </div>
-            <div class="info-con">
+        <mx-slide-delete
+            :itemId="item.id"
+            @deleteItem="deleteItem(item.id)"
+            ref="deleteCon"
+            v-for="(item, idx) in infos"
+            :key="idx"
+            deleteStyles="z-index: -1; height: 100%"
+        >
+            <div class="address-item" @click="changeAddress(item)">
+                <div class="icon-con">
+                    <div :class="['check-icon', item.isDefault ? 'checked' : '']"></div>
+                </div>
+                <div class="info-con">
                 <span class="top">
                     <span class="name">{{ item.contacts }}</span>
                     <span v-if="false" class="phone">{{ item.phone }}</span>
                 </span>
-                <span class="address">{{ item.proviceName }}{{ item.cityName }}{{ item.countyName }}{{ item.addr }}</span>
+                    <span class="address">{{ item.proviceName }}{{ item.cityName }}{{ item.countyName }}{{ item.addr }}</span>
+                </div>
+                <div class="edit-arrow" @click.stop="$router.push(`/shop/editAddress/${item.id}`)"></div>
             </div>
-            <div class="edit-arrow" @click.stop="$router.push(`/shop/editAddress/${item.id}`)"></div>
-        </div>
+        </mx-slide-delete>
 
         <div class="address-item" style="height: 1.3rem" @click="addAddress">
             <div class="icon-con">
@@ -25,7 +34,9 @@
     </div>
 </template>
 <script>
-    import { getMyAddress, setDefaultAddress } from '../../../api/shopApi'
+    import { getMyAddress, setDefaultAddress, removeAddress } from '../../../api/shopApi'
+    import MxSlideDelete from '../../../components/slideDelete/MxSlideDelete.vue'
+
     export default {
         created() {
             document.title = this.$route.meta.title
@@ -41,6 +52,7 @@
             }
         },
         components: {
+            MxSlideDelete
         },
         methods: {
             changeAddress(item) {
@@ -54,6 +66,14 @@
             },
             addAddress() {
                 this.$router.push('/shop/addAddress')
+            },
+            deleteItem(id) {
+                removeAddress(id).then(response => {
+                    if (response.body.code == 200) {
+                        this.infos = this.infos.filter(item => item.id != id)
+                        this.$refs.deleteCon.forEach(item => item.txtStyle = '')
+                    }
+                })
             }
         }
     }

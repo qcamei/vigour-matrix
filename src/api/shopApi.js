@@ -80,6 +80,11 @@ export const editAddress = function (postInfo, id) {
     })
 }
 
+// 删除单条收货地址
+export const removeAddress = function (id) {
+    return Vue.http.delete(baseURL + '/wechat/addressInfo/' + id)
+}
+
 // 获取开票信息列表
 export const getInvoiceInfo = function () {
     return Vue.http.get(baseURL + '/wechat/invoiceInfo')
@@ -97,6 +102,11 @@ export const editInvoiceInfo = function (postInfo, id) {
     return Vue.http.put(baseURL + '/wechat/invoiceInfo/' + id, {
         ...postInfo
     })
+}
+
+// 删除开票信息
+export const removeInvoiceInfo = function (id) {
+    return Vue.http.delete(baseURL + '/wechat/invoiceInfo/' + id)
 }
 
 // 获取单条发票信息
@@ -241,7 +251,7 @@ export const applyServiceConfirm = function (id) {
 
 // 申请单确认下单
 export const applyOrderConfirm = function (id) {
-    return Vue.http.put(baseURL + '/wechat/applyOrder/apply/verify/service/order/' + id, {
+    return Vue.http.put(baseURL + '/wechat/applyOrder/apply/verify/order/' + id, {
         id
     })
 }
